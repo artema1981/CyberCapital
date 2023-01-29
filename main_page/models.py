@@ -24,9 +24,9 @@ class Exchanges(models.Model):
         ordering = ('name',)
 
 
-class Api(models.Model):
-
-    user =
-    exchange = models.ForeignKey(Exchanges, on_delete=models.CASCADE)
-    api_key = models.CharField(max_length=250, unique=True)
-    secret_api_key = models.CharField(max_length=250, unique=True)
+# class Api(models.Model):
+#
+#     user =
+#     exchange = models.ForeignKey(Exchanges, on_delete=models.CASCADE)
+#     api_key = models.CharField(max_length=250, unique=True)
+#     secret_api_key = models.CharField(max_length=250, unique=True)

@@ -1,8 +1,8 @@
 from main_page.models import Exchanges
 
+def get_exchages():
+    print(Exchanges.objects.all())
 
-x = Exchanges.objects
-print(x)
 
 
 
