@@ -1,5 +1,5 @@
-from django.conf import settings
 from django import forms
+from .models import AddApiKey
 
-class AddApiKey(forms.Form):
+class AddApiKeyForm(forms.ModelForm):
     pass
