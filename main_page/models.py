@@ -18,7 +18,7 @@ class Exchanges(models.Model):
     ping = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return f'{self.name}: {self.position}'
+        return f'{self.name}'
 
     class Meta:
         ordering = ('name',)
@@ -26,7 +26,7 @@ class Exchanges(models.Model):
 
 class AddApiKey(models.Model):
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
     exchange = models.ForeignKey(Exchanges, on_delete=models.CASCADE)
     api_key = models.CharField(max_length=250, unique=True)
     secret_api_key = models.CharField(max_length=250, unique=True)
