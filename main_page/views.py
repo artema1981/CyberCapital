@@ -2,7 +2,7 @@ from django.shortcuts import render
 from .models import Exchanges
 from .forms import AddApiKeyForm
 from django.contrib.auth.models import User
-from .arbi_alg import client
+from .arbi_alg import *
 
 
 # Create your views here.
@@ -16,10 +16,12 @@ def main_page(request):
     user = User.objects.filter(is_active=True)
     exchanges = Exchanges.objects.filter(is_visible=True)
     api_form = AddApiKeyForm
-    # sym = client.exchange_info('GMTUSDT')['symbols'][0]['symbol']
     return render(request, 'index.html', context={
+        'title': 'exchanges',
         'user': user,
         'exchanges': exchanges,
         'api_form': api_form,
-        # 'sym': sym,
     })
+
+def balances(request):
+    return render(request, 'balances.html')
