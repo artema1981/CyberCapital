@@ -1,7 +1,12 @@
-from main_page.models import Exchanges
 
-def get_exchages():
-    print(Exchanges.objects.all())
+from binance.spot import Spot as Client
+from config import API_KEY, API_SECRET
+
+
+client = Client(API_KEY, API_SECRET, base_url='https://api.binance.com')
+
+# def get_exchages():
+#     print(Exchanges.objects.filter(is_visible=True))
 
 
 

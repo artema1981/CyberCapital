@@ -142,7 +142,7 @@
                       <tr style="height: 51px;">
                         <td class="u-table-cell">{{ exchange.name }}</td>
                           {% if exchange.api_connect == False %}
-                              <td class="u-table-cell">disconnect</td>
+                              <td class="u-table-cell">disconnect{{ sym }}</td>
                           {% else %}
                               <td class="u-table-cell">connect</td>
                           {% endif %}
