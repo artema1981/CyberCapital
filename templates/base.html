@@ -31,9 +31,10 @@
   </head>
 
 
-  <body data-home-page="Exchanges.html" data-home-page-title="Exchanges" class="u-body u-xl-mode" data-lang="en"><header class="u-clearfix u-header u-header" id="sec-5e11"><div class="u-clearfix u-sheet u-valign-middle u-sheet-1">
+  <body data-home-page="Exchanges.html" data-home-page-title="Exchanges" class="u-body u-xl-mode" data-lang="en">
+  <header class="u-clearfix u-header u-header" id="sec-5e11"><div class="u-clearfix u-sheet u-valign-middle u-sheet-1">
         <a href="/" class="u-image u-logo u-image-1" data-image-width="630" data-image-height="628">
-          <img src= {% static "images/logo.png" %} class="u-logo-image u-logo-image-1">
+          <img src= {% static "images/logo.png"%}  class="u-logo-image u-logo-image-1" >
         </a>
         <nav class="u-menu u-menu-dropdown u-offcanvas u-menu-1">
           <div class="menu-collapse" style="font-size: 1rem; letter-spacing: 0px;">
@@ -43,7 +44,6 @@
               </g></svg>
             </a>
           </div>
-
           <div class="u-nav-container">
             <ul class="u-nav u-unstyled u-nav-1">
             <li class="u-nav-item"><a class="u-button-style u-nav-link u-text-active-palette-1-base u-text-hover-palette-2-base" href="/" style="padding: 10px 20px;">Exchanges</a>
@@ -98,9 +98,10 @@
                             {% endif %}
                             </ul>
                         </div>
-                    </div>
+             </div>
             <div class="u-black u-menu-overlay u-opacity u-opacity-70"></div>
-          </div>
+           </div>
+
         </nav>
       </div>
   </header>
@@ -109,8 +110,8 @@
         {% block loging %}
         {% endblock %}
       </main>
-          {% block content %}
-          {% endblock %}
+        {% block content %}
+        {% endblock %}
 
 
     <section class="u-align-center u-clearfix u-section-2" id="sec-9bd7">
