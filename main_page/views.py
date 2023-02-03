@@ -24,4 +24,7 @@ def main_page(request):
     })
 
 def balances(request):
-    return render(request, 'balances.html')
+    return render(request, 'balances.html', context={
+        'title': 'balances',
+
+    })
