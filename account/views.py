@@ -4,7 +4,7 @@ from .forms import RegistrationForm, LoginForm
 from django.views.generic import ListView, DetailView,CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import User
 
 
 # Create your views here.
@@ -38,7 +38,4 @@ def registration_view(request):
         new_user.save()
         return render(request, 'registration_done.html', context={'user': new_user})
     return render(request, 'registration.html', context={'form': form})
-
-
 # class RegisterUser(DataMixin, CreateView):
-#     pass
