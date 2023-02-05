@@ -1,6 +1,12 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from .forms import RegistrationForm, LoginForm
+from django.views.generic import ListView, DetailView,CreateView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse_lazy
+from django.contrib.auth.forms import UserCreationForm
+
+
 # Create your views here.
 def login_view(request):
     form = LoginForm(request.POST or None)
@@ -17,7 +23,8 @@ def login_view(request):
 
         return redirect(next_get or next_post or '/')
 
-    return render(request, 'login.html', context={'form': form})
+    return render(request, 'login.html', context={'form': form,
+                                                  'title': 'login'})
 
 def logout_view(request):
     logout(request)
@@ -31,3 +38,7 @@ def registration_view(request):
         new_user.save()
         return render(request, 'registration_done.html', context={'user': new_user})
     return render(request, 'registration.html', context={'form': form})
+
+
+# class RegisterUser(DataMixin, CreateView):
+#     pass

@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <title>{{ title }}</title>
     <link rel="stylesheet" href={% static "nicepage.css" %} media="screen">
-<link rel="stylesheet" href={% static "Exchenges.css" %} media="screen">
+    <link rel="stylesheet" href={% static "Exchenges.css" %} media="screen">
     <script class="u-script" type="text/javascript" src={% static "jquery.js" %} defer=""></script>
     <script class="u-script" type="text/javascript" src={% static "nicepage.js" %} defer=""></script>
     <meta name="generator" content="Nicepage 5.3.6, nicepage.com">
@@ -31,10 +31,14 @@
   </head>
 
 
-  <body data-home-page="Exchanges.html" data-home-page-title="Exchanges" class="u-body u-xl-mode" data-lang="en"><header class="u-clearfix u-header u-header" id="sec-5e11"><div class="u-clearfix u-sheet u-valign-middle u-sheet-1">
-        <a href="/" class="u-image u-logo u-image-1" data-image-width="630" data-image-height="628">
-          <img src= {% static "images/logo.png" %} class="u-logo-image u-logo-image-1">
+  <body class="u-body u-xl-mode" data-lang="en">
+
+  {% block header %}
+  <header class="u-clearfix u-header u-header" id="sec-5e11"><div class="u-clearfix u-sheet u-valign-middle u-sheet-1">
+        <a href="{% url 'home' %}" class="u-image u-logo u-image-1" data-image-width="630" data-image-height="628">
+          <img src= {% static "images/logo.png"%}  class="u-logo-image u-logo-image-1">
         </a>
+
         <nav class="u-menu u-menu-dropdown u-offcanvas u-menu-1">
           <div class="menu-collapse" style="font-size: 1rem; letter-spacing: 0px;">
             <a class="u-button-style u-custom-left-right-menu-spacing u-custom-padding-bottom u-custom-top-bottom-menu-spacing u-nav-link u-text-active-palette-1-base u-text-hover-palette-2-base" href="#">
@@ -43,26 +47,30 @@
               </g></svg>
             </a>
           </div>
-
           <div class="u-nav-container">
             <ul class="u-nav u-unstyled u-nav-1">
-            <li class="u-nav-item"><a class="u-button-style u-nav-link u-text-active-palette-1-base u-text-hover-palette-2-base" href="/" style="padding: 10px 20px;">Exchanges</a>
+            <li class="u-nav-item"><a class="u-button-style u-nav-link u-text-active-palette-1-base u-text-hover-palette-2-base" href="{% url 'home' %}" style="padding: 10px 20px;">Exchanges</a>
             </li>
-            <li class="u-nav-item"><a class="u-button-style u-nav-link u-text-active-palette-1-base u-text-hover-palette-2-base" href="../static/test/Statistics.html" style="padding: 10px 20px;">Statistics</a>
+            <li class="u-nav-item"><a class="u-button-style u-nav-link u-text-active-palette-1-base u-text-hover-palette-2-base" href="{% url 'balances' %}" style="padding: 10px 20px;">Balances</a>
             </li>
+            <li class="u-nav-item"><a class="u-button-style u-nav-link u-text-active-palette-1-base u-text-hover-palette-2-base" href="{% url 'statistics' %} " style="padding: 10px 20px;">Statistics</a>
+            </li>
+<!--
             <li class="u-nav-item"><a class="u-button-style u-nav-link u-text-active-palette-1-base u-text-hover-palette-2-base" href="../static/test/Bunchs.html" style="padding: 10px 20px;">Bunchs</a>
             </li>
+-->
+
             <li class="u-nav-item"><a class="u-button-style u-nav-link u-text-active-palette-1-base u-text-hover-palette-2-base" style="padding: 10px 20px;">Account</a>
               <div class="u-nav-popup">
                   <ul class="u-h-spacing-20 u-nav u-unstyled u-v-spacing-10">
                       {% if not user.is_authenticated %}
-                      <li class="u-nav-item"><a href="/login/" class="u-button-style u-nav-link u-white">login</a>
+                      <li class="u-nav-item"><a href="{% url 'login' %}" class="u-button-style u-nav-link u-white">login</a>
                         </li>
-                      <li class="u-nav-item"><a href="/registration/" class="u-button-style u-nav-link u-white">registration</a>
+                      <li class="u-nav-item"><a href="{% url 'registration' %}" class="u-button-style u-nav-link u-white">registration</a>
                         </li>
                       {% endif %}
                       {% if user.is_authenticated %}
-                      <li class="u-nav-item"><a href="/logout/" class="u-button-style u-nav-link u-white">logout</a>
+                      <li class="u-nav-item"><a href="{% url 'logout' %}" class="u-button-style u-nav-link u-white">logout</a>
                         </li>
                       {% endif %}
                  </ul>
@@ -73,47 +81,50 @@
             <div class="u-black u-container-style u-inner-container-layout u-opacity u-opacity-95 u-sidenav">
               <div class="u-inner-container-layout u-sidenav-overflow">
                 <div class="u-menu-close"></div>
-                <ul class="u-align-center u-nav u-popupmenu-items u-unstyled u-nav-2"><li class="u-nav-item"><a class="u-button-style u-nav-link" href="/">Exchanges</a>
+                <ul class="u-align-center u-nav u-popupmenu-items u-unstyled u-nav-2"><li class="u-nav-item"><a class="u-button-style u-nav-link" href="{% url 'home' %}">Exchanges</a>
                     </li>
-                    <li class="u-nav-item"><a class="u-button-style u-nav-link" href="../static/test/Statistics.html">Statistics</a>
+                    <li class="u-nav-item"><a class="u-button-style u-nav-link" href="{% url 'balances' %}">Balances</a>
                     </li>
-                    <li class="u-nav-item"><a class="u-button-style u-nav-link" href="balances.html">Balances</a>
+
+                    <li class="u-nav-item"><a class="u-button-style u-nav-link" href="{% url 'statistics' %}">Statistics</a>
                     </li>
+        <!--
                     <li class="u-nav-item"><a class="u-button-style u-nav-link" href="../static/test/Bunchs.html">Bunchs</a>
                     </li>
+                -->
                     <li class="u-nav-item"><a class="u-button-style u-nav-link" >Account</a>
                         <div class="u-nav-popup">
                             <ul class="u-h-spacing-20 u-nav u-unstyled u-v-spacing-10">
                             {% if not user.is_authenticated %}
-                                <li class="u-nav-item"><a href="/login/" class="u-button-style u-nav-link u-white">login</a>
+                                <li class="u-nav-item"><a href="{% url 'login' %}" class="u-button-style u-nav-link u-white">login</a>
                                 </li>
-                                <li class="u-nav-item"><a href="/registration/" class="u-button-style u-nav-link u-white">registration</a>
+                                <li class="u-nav-item"><a href="{% url 'registration' %}" class="u-button-style u-nav-link u-white">registration</a>
                                 </li>
                             {% endif %}
                             {% if user.is_authenticated %}
-                                <li class="u-nav-item"><a href="/logout/" class="u-button-style u-nav-link u-white">logout</a>
+                                <li class="u-nav-item"><a href="{% url 'logout' %}" class="u-button-style u-nav-link u-white">logout</a>
                                 </li>
                             {% endif %}
                             </ul>
                         </div>
-                    </div>
-
-
+             </div>
             <div class="u-black u-menu-overlay u-opacity u-opacity-70"></div>
-          </div>
+           </div>
+
+
+
+
         </nav>
       </div>
-  </header>
 
+
+  </header>
+{% endblock %}
       <main id="main">
-        {% block loging %}
+        {% block content %}
         {% endblock %}
       </main>
-          {% block balance %}
-          {% endblock %}
 
-  {% block index %}
-  {% endblock %}
 
     <section class="u-align-center u-clearfix u-section-2" id="sec-9bd7">
       <div class="u-clearfix u-sheet u-sheet-1"></div>

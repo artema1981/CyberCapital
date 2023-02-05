@@ -18,11 +18,11 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls import static
 from account.views import login_view, logout_view, registration_view
-
+from main_page.views import balances, statistics
 urlpatterns = [
     path('login/', login_view, name='login'),
     path('logout/', logout_view, name='logout'),
     path('registration/', registration_view, name='registration'),
     path('admin/', admin.site.urls),
-    path('', include('main_page.urls'))
+    path('', include('main_page.urls')),
 ]
