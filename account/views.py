@@ -38,4 +38,6 @@ def registration_view(request):
         new_user.save()
         return render(request, 'registration_done.html', context={'user': new_user})
     return render(request, 'registration.html', context={'form': form})
+
+
 # class RegisterUser(DataMixin, CreateView):
