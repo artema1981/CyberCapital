@@ -1,37 +1,15 @@
 from django.contrib.auth.views import LoginView
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
-
 from main_page.utils import DataMixin
 from .forms import RegistrationForm, LoginForm
-from django.views.generic import ListView, DetailView,CreateView
+from django.views.generic import ListView, DetailView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.contrib.auth.forms import User, UserCreationForm
+from django.contrib.auth.decorators import login_required
 
 
-# Create your views here.
-# def login_view(request):
-#     form = LoginForm(request.POST or None)
-#     next_get = request.GET.get('next')
-#
-#     if form.is_valid():
-#         username = request.POST.get('username')
-#         password = request.POST.get('password')
-#
-#         user = authenticate(username=username, password=password)
-#         login(request, user)
-#
-#         next_post = request.POST.get('next')
-#
-#         return redirect(next_get or next_post or '/')
-#
-#     return render(request, 'login.html', context={'form': form,
-#                                                   'title': 'login'})
-
-def logout_view(request):
-    logout(request)
-    return redirect('/')
 
 
 
@@ -57,3 +35,12 @@ class LoginUser(DataMixin, LoginView):
 
     def get_success_url(self):
         return reverse_lazy('home')
+
+def logout_view(request):
+    logout(request)
+    return redirect('/')
+
+
+@login_required
+def profile(request):
+    return render(request, 'profile.html')
