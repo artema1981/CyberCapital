@@ -17,13 +17,14 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls import static
-from account.views import logout_view, RegisterUser, LoginUser, profile
+from account.views import logout_view, RegisterUser, LoginUser, ProfilePage
 from main_page.views import balances, statistics
+
 urlpatterns = [
     path('login/', LoginUser.as_view(), name='login'),
     path('logout/', logout_view, name='logout'),
     path('registration/', RegisterUser.as_view(), name='registration'),
-    path('profile/', profile, name='profile'),
+    path('profile/', ProfilePage.as_view(), name='profile'),
     path('admin/', admin.site.urls),
     path('', include('main_page.urls')),
 ]

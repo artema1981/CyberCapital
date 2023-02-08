@@ -2,6 +2,7 @@ from django.db import models
 import uuid
 import os
 from django.contrib.auth.models import User
+from account.models import Profile
 
 # Create your models here.
 class Exchanges(models.Model):
@@ -23,13 +24,14 @@ class Exchanges(models.Model):
     class Meta:
         ordering = ('name',)
 
-
+# def get_pofile_user_id():
+#     return Profile.pk
 class AddApiKey(models.Model):
 
-    user = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
+    user_profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     exchange = models.ForeignKey(Exchanges, on_delete=models.CASCADE)
     api_key = models.CharField(max_length=250, unique=True)
     secret_api_key = models.CharField(max_length=250, unique=True)
 
     def __str__(self):
-        return f'user: {self.user} exchange: {self.exchange} api_key:{self.api_key} secret_api_key{self.secret_api_key}'
+        return f'user: {self.user_profile} exchange: {self.exchange} api_key:{self.api_key} secret_api_key{self.secret_api_key}'

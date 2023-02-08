@@ -1,6 +1,8 @@
 from django.contrib.auth.views import LoginView
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
+from django.views import View
+
 from main_page.utils import DataMixin
 from .forms import RegistrationForm, LoginForm
 from django.views.generic import ListView, DetailView, CreateView
@@ -8,7 +10,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.contrib.auth.forms import User, UserCreationForm
 from django.contrib.auth.decorators import login_required
-
+from .models import Profile
 
 
 
@@ -41,6 +43,19 @@ def logout_view(request):
     return redirect('/')
 
 
-@login_required
-def profile(request):
-    return render(request, 'profile.html')
+# @login_required
+# def profile(request):
+#     return render(request, 'profile.html')
+class ProfilePage(LoginRequiredMixin, DataMixin, ListView):
+    model = Profile
+    template_name = 'profile.html'
+    context_object_name = 'profile'
+
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        c_def = self.get_user_context(title='profile')
+        return dict(list(context.items()) + list(c_def.items()))
+
+    def get_user_context(self, **kwargs):
+        return super(ProfilePage, self).get_user_context(**kwargs)
