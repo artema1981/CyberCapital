@@ -58,7 +58,6 @@ def balances(request):
 
     })
 
-
 def statistics(request):
     return render(request, 'statistics.html', context={
         'title': 'statistics',
