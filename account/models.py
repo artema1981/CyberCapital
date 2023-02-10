@@ -8,4 +8,4 @@ class Profile(models.Model):
     bio = models.TextField(blank=True)
 
     def __str__(self):
-        return self.user.username, self.user.pk, self.pk
+        return self.user.username

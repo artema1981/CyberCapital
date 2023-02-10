@@ -28,7 +28,7 @@ class Exchanges(models.Model):
 #     return Profile.pk
 class AddApiKey(models.Model):
 
-    user_profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    user_profile = models.ForeignKey(User, on_delete=models.CASCADE)
     exchange = models.ForeignKey(Exchanges, on_delete=models.CASCADE)
     api_key = models.CharField(max_length=250, unique=True)
     secret_api_key = models.CharField(max_length=250, unique=True)

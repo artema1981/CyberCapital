@@ -3,13 +3,13 @@ from .models import AddApiKey, Exchanges
 from django.contrib.auth.models import User
 from account.models import Profile
 class AddApiKeyForm(forms.ModelForm):
-
-    user_profile = forms.ModelChoiceField(queryset=Profile.objects.all(), widget=forms.Select(attrs={
-        'id': "select-f1e4",
-        'name': "select",
-        'class': "u-border-1 u-border-grey-30 u-input u-input-rectangle u-white",
-        'required': "required"
-    }))
+    #
+    # user_profile = forms.ModelChoiceField(queryset=Profile.objects.all(), widget=forms.Select(attrs={
+    #     'id': "select-f1e4",
+    #     'name': "select",
+    #     'class': "u-border-1 u-border-grey-30 u-input u-input-rectangle u-white",
+    #     'required': "required"
+    # }))
 
     exchange = forms.ModelChoiceField(queryset=Exchanges.objects.all(), widget=forms.Select(attrs={
         'id': "select-f1e4",
@@ -33,4 +33,4 @@ class AddApiKeyForm(forms.ModelForm):
     }))
     class Meta:
         model = AddApiKey
-        fields = ('user_profile', 'exchange', 'api_key', 'secret_api_key')
+        fields = ('exchange', 'api_key', 'secret_api_key')

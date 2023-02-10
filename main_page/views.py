@@ -25,16 +25,28 @@ class MainPage(DataMixin, ListView):
     def get_queryset(self):
         return Exchanges.objects.filter(is_visible=True)
 
+def api_form_view(request):
+    if request.method == "POST":
+        api_form = AddApiKeyForm(request.POST)
+        if api_form.is_valid():
+            order = api_form.save(commit=False)
+            order.user_profile = request.user
+            order.save()
 
-class AddApi(LoginRequiredMixin, DataMixin, CreateView):
-    form_class = AddApiKeyForm
-    template_name = 'addapi.html'
-    login_url = reverse_lazy('login')
 
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = super().get_context_data(**kwargs)
-        c_def = self.get_user_context(title='addapi')
-        return dict(list(context.items()) + list(c_def.items()))
+    api_form = AddApiKeyForm
+    return render(request, 'addapi.html', context={
+        'api_form': api_form,
+    })
+# class AddApi(LoginRequiredMixin, DataMixin, CreateView):
+#     form_class = AddApiKeyForm
+#     template_name = 'addapi.html'
+#     login_url = reverse_lazy('login')
+#
+#     def get_context_data(self, *, object_list=None, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         c_def = self.get_user_context(title='addapi')
+#         return dict(list(context.items()) + list(c_def.items()))
 
     # def get_queryset(self):
     #     return AddApiKeyForm
