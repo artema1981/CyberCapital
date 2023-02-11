@@ -34,9 +34,11 @@ class Exchanges_view(LoginRequiredMixin, DataMixin, ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context(title='exchanges')
-        c_def2 = self.get_api()
-        print(self.request.user.pk)
-        return dict(list(context.items()) + list(c_def.items()) + list(c_def2.items()))
+        users_key = AddApiKey.objects.filter(user_profile_id=self.request.user.pk)
+        context['users_key'] = users_key
+
+        print(dict(list(context.items()) + list(c_def.items())))
+        return dict(list(context.items()) + list(c_def.items()))
 
     def get_queryset(self):
         return Exchanges.objects.filter(is_visible=True)
