@@ -1,4 +1,6 @@
+from .models import AddApiKey
 
+api_dict = AddApiKey.objects.get_queryset()
 
 menu = [{'title': 'Home', 'url_name': 'home'},
         {'title': 'Exchanges', 'url_name': 'exchanges'},

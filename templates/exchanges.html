@@ -13,12 +13,17 @@
           </tr>
           </thead>
           <tbody>
+
+          {% for i in exchanges %}
+
           <tr>
-            <th scope="row">1</th>
+            <th scope="row">{{ api }}</th>
             <td>Mark</td>
             <td>Otto</td>
             <td>@mdo</td>
           </tr>
+          {% endfor %}
+          <!--
           <tr>
             <th scope="row">2</th>
             <td>Jacob</td>
@@ -30,7 +35,9 @@
             <td colspan="2">Larry the Bird</td>
             <td>@twitter</td>
           </tr>
+          -->
           </tbody>
+
         </table>
         </div></div>
 

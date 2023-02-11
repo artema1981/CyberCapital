@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.urls import reverse_lazy
-from .models import Exchanges
+from .models import Exchanges, AddApiKey
 from .forms import AddApiKeyForm
 from django.contrib.auth.models import User
 from django.views.generic import ListView, CreateView
@@ -32,6 +32,7 @@ class Exchanges_view(DataMixin, ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context(title='exchanges')
+        print(api_dict)
         return dict(list(context.items()) + list(c_def.items()))
 
     def get_queryset(self):
@@ -54,18 +55,15 @@ def api_form_view(request):
     return render(request, 'addapi.html', context=context)
 
 
-# class AddApi(LoginRequiredMixin, DataMixin, CreateView):
-#     form_class = AddApiKeyForm
-#     template_name = 'addapi.html'
-#     login_url = reverse_lazy('login')
+# class Api_view(LoginRequiredMixin, DataMixin, ListView):
+#     model = AddApiKey
+#     template_name = 'exchanges.html'
+#     context_object_name = 'api'
 #
-#     def get_context_data(self, *, object_list=None, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         c_def = self.get_user_context(title='addapi')
-#         return dict(list(context.items()) + list(c_def.items()))
+#     def get_queryset(self):
+#         return  AddApiKey.objects.all()#AddApiKey.objects.filter(user_profile=request.user)
 
-# def get_queryset(self):
-#     return AddApiKeyForm
+
 
 
 class Balances(LoginRequiredMixin, DataMixin, ListView):
