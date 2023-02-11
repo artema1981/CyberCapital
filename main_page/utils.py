@@ -1,6 +1,7 @@
 
 
-menu = [{'title': 'Exchanges', 'url_name': 'home'},
+menu = [{'title': 'Home', 'url_name': 'home'},
+        {'title': 'Exchanges', 'url_name': 'exchanges'},
         {'title': 'Api', 'url_name': 'addapi'},
         {'title': 'Balances', 'url_name': 'balances'},
         {'title': 'Statistics', 'url_name': 'statistics'},

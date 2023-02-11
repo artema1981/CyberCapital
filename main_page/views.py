@@ -13,6 +13,20 @@ from django.contrib.auth.models import User
 class MainPage(DataMixin, ListView):
     model = Exchanges
     template_name = 'index.html'
+
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        c_def = self.get_user_context(title='Cyber Capital')
+        return dict(list(context.items()) + list(c_def.items()))
+
+    def get_queryset(self):
+        return 'Cyber Capital'
+
+
+class Exchanges_view(DataMixin, ListView):
+    model = Exchanges
+    template_name = 'exchanges.html'
     context_object_name = 'exchanges'
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -22,6 +36,7 @@ class MainPage(DataMixin, ListView):
 
     def get_queryset(self):
         return Exchanges.objects.filter(is_visible=True)
+
 
 def api_form_view(request):
     if request.method == "POST":
