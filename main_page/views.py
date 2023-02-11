@@ -8,12 +8,12 @@ from .utils import *
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 
+
 # Create your views here.
 
 class MainPage(DataMixin, ListView):
     model = Exchanges
     template_name = 'index.html'
-
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -52,6 +52,8 @@ def api_form_view(request):
         'api_form': api_form
     }
     return render(request, 'addapi.html', context=context)
+
+
 # class AddApi(LoginRequiredMixin, DataMixin, CreateView):
 #     form_class = AddApiKeyForm
 #     template_name = 'addapi.html'
@@ -62,12 +64,11 @@ def api_form_view(request):
 #         c_def = self.get_user_context(title='addapi')
 #         return dict(list(context.items()) + list(c_def.items()))
 
-    # def get_queryset(self):
-    #     return AddApiKeyForm
+# def get_queryset(self):
+#     return AddApiKeyForm
 
 
-
-class Balances(DataMixin, ListView):
+class Balances(LoginRequiredMixin, DataMixin, ListView):
     template_name = 'balances.html'
     context_object_name = 'balances'
 
@@ -79,7 +80,8 @@ class Balances(DataMixin, ListView):
     def get_queryset(self):
         return 'balance.objects.filter(is_visible=True)'
 
-class Statistics(DataMixin, ListView):
+
+class Statistics(LoginRequiredMixin, DataMixin, ListView):
     template_name = 'statistics.html'
     context_object_name = 'statistics'
 
