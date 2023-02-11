@@ -1,5 +1,7 @@
 from django.shortcuts import render
 from django.urls import reverse_lazy
+from django.views import View
+
 from .models import Exchanges, AddApiKey
 from .forms import AddApiKeyForm
 from django.contrib.auth.models import User
@@ -24,7 +26,7 @@ class MainPage(DataMixin, ListView):
         return 'Cyber Capital'
 
 
-class Exchanges_view(DataMixin, ListView):
+class Exchanges_view(LoginRequiredMixin, DataMixin, ListView):
     model = Exchanges
     template_name = 'exchanges.html'
     context_object_name = 'exchanges'
@@ -33,12 +35,29 @@ class Exchanges_view(DataMixin, ListView):
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context(title='exchanges')
         c_def2 = self.get_api()
-        print(type(dict(list(context.items()))),  type(list(c_def.items())))
-        return dict(list(context.items()) + list(c_def.items()))
+        print(self.request.user.pk)
+        return dict(list(context.items()) + list(c_def.items()) + list(c_def2.items()))
 
     def get_queryset(self):
         return Exchanges.objects.filter(is_visible=True)
 
+
+
+# class Api_form_view(View):
+#     def api_form_view(self, request):
+#         if request.method == "POST":
+#             api_form = AddApiKeyForm(request.POST)
+#             if api_form.is_valid():
+#                 order = api_form.save(commit=False)
+#                 order.user_profile = request.user
+#                 order.save()
+#
+#         api_form = AddApiKeyForm
+#         context = {
+#             'menu': menu,
+#             'api_form': api_form
+#         }
+#         return render(request, 'addapi.html', context=context)
 
 def api_form_view(request):
     if request.method == "POST":
