@@ -18,7 +18,6 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls import static
 from account.views import logout_view, RegisterUser, LoginUser, ProfilePage
-from main_page.views import balances, statistics
 
 urlpatterns = [
     path('login/', LoginUser.as_view(), name='login'),

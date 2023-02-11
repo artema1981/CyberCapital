@@ -1,11 +1,9 @@
 from django.shortcuts import render
 from django.urls import reverse_lazy
-
 from .models import Exchanges
 from .forms import AddApiKeyForm
 from django.contrib.auth.models import User
 from django.views.generic import ListView, CreateView
-from .arbi_alg import *
 from .utils import *
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
@@ -33,11 +31,12 @@ def api_form_view(request):
             order.user_profile = request.user
             order.save()
 
-
     api_form = AddApiKeyForm
-    return render(request, 'addapi.html', context={
-        'api_form': api_form,
-    })
+    context = {
+        'menu': menu,
+        'api_form': api_form
+    }
+    return render(request, 'addapi.html', context=context)
 # class AddApi(LoginRequiredMixin, DataMixin, CreateView):
 #     form_class = AddApiKeyForm
 #     template_name = 'addapi.html'
@@ -52,14 +51,27 @@ def api_form_view(request):
     #     return AddApiKeyForm
 
 
-def balances(request):
-    return render(request, 'balances.html', context={
-        'title': 'balances',
 
-    })
+class Balances(DataMixin, ListView):
+    template_name = 'balances.html'
+    context_object_name = 'balances'
 
-def statistics(request):
-    return render(request, 'statistics.html', context={
-        'title': 'statistics',
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        c_def = self.get_user_context(title='balances')
+        return dict(list(context.items()) + list(c_def.items()))
 
-    })
+    def get_queryset(self):
+        return 'balance.objects.filter(is_visible=True)'
+
+class Statistics(DataMixin, ListView):
+    template_name = 'statistics.html'
+    context_object_name = 'statistics'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        c_def = self.get_user_context(title='statistics')
+        return dict(list(context.items()) + list(c_def.items()))
+
+    def get_queryset(self):
+        return 'statistics'

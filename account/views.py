@@ -1,4 +1,4 @@
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView, redirect_to_login
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.views import View
@@ -50,6 +50,7 @@ class ProfilePage(LoginRequiredMixin, DataMixin, ListView):
     model = Profile
     template_name = 'profile.html'
     context_object_name = 'profile'
+    # redirect_field_name = 'next'
 
 
     def get_context_data(self, *, object_list=None, **kwargs):

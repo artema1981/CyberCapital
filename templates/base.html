@@ -78,6 +78,7 @@
   </head>
   <body>
 
+
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
   <symbol id="bootstrap" viewBox="0 0 118 94">
     <title>Bootstrap</title>
@@ -105,29 +106,45 @@
 <main>
 
 
-  <div class="b-example-divider"></div>
 {% block header %}
   <div class="container">
     <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
-      <a href="{% url 'home' %}" class="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none">
-        <svg class="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap"><use xlink:href="#bootstrap"/></svg>
-      </a>
+      <a href="/" class="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none">
+        <img src= {% static "images/logo63_63.png"%}  class="u-logo-image u-logo-image-1">
+         </a>
 
       <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
           {% for i in menu %}
-            <li><a href="{% url i.url_name %}" class="nav-link px-2 link-secondary">{{ i.title }}</a></li>
+              {% if not forloop.first %}
+                <li><a href="{% url i.url_name %} " class="nav-link px-2 link-secondary">{{ i.title }}</a></li>
+              {% else %}
+                <li><a href="{% url i.url_name %} " class="nav-link px-2 link-dark">{{ i.title }}</a></li>
+              {% endif %}
               <!--
                <li><a href="#" class="nav-link px-2 link-secondary">Home</a></li>
                <li><a href="#" class="nav-link px-2 link-dark">Features</a></li>
-              -->
+               -->
           {% endfor %}
 
       </ul>
 
       <div class="col-md-3 text-end">
-        <button type="button" class="btn btn-outline-primary me-2">Login</button>
-        <button type="button" class="btn btn-primary">Sign-up</button>
+      <ul class="u-h-spacing-20 u-nav u-unstyled u-v-spacing-10">
+          {% if not user.is_authenticated %}
+
+             <button onclick="document.location={% url 'login' %}" type="button" class="btn btn-outline-primary me-2">Login</button>
+             <button onclick="document.location={% url 'registration' %}" type="button" class="btn btn-primary">Sign-up</button>
+          {% endif %}
+          {% if user.is_authenticated %}
+
+             <button onclick="document.location={% url 'logout' %}" type="button" class="btn btn-outline-primary me-2">logout</button>
+          {% endif %}
+
+      </ul>
       </div>
+
+
+
     </header>
   </div>
 {% endblock %}
