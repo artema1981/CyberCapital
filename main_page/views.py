@@ -92,7 +92,7 @@ class ApiCreateView(CreateView):
 class ApiUpdateView(UpdateView):
     model = AddApiKey
     fields = ['user_profile', 'exchange', 'api_key', 'secret_api_key']
-
+    template_name_suffix = '_update_form'
 class ApiDeleteView(DeleteView):
     model = AddApiKey
     success_url = reverse_lazy('api-list')
