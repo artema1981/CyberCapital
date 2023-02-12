@@ -30,8 +30,8 @@ class AddApiKey(models.Model):
 
     user_profile = models.ForeignKey(User, on_delete=models.CASCADE)
     exchange = models.ForeignKey(Exchanges, on_delete=models.CASCADE)
-    api_key = models.CharField(max_length=250, unique=True)
-    secret_api_key = models.CharField(max_length=250, unique=True)
+    api_key = models.CharField(max_length=250)
+    secret_api_key = models.CharField(max_length=250)
 
     def __str__(self):
         return f'user: {self.user_profile.pk} exchange: {self.exchange} api_key:{self.api_key} secret_api_key{self.secret_api_key}'

@@ -5,7 +5,7 @@ from django.views import View
 from .models import Exchanges, AddApiKey
 from .forms import AddApiKeyForm
 from django.contrib.auth.models import User
-from django.views.generic import ListView, CreateView
+from django.views.generic import ListView, CreateView, FormView
 from .utils import *
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
@@ -45,36 +45,43 @@ class Exchanges_view(LoginRequiredMixin, DataMixin, ListView):
 
 
 
-# class Api_form_view(View):
-#     def api_form_view(self, request):
-#         if request.method == "POST":
-#             api_form = AddApiKeyForm(request.POST)
-#             if api_form.is_valid():
-#                 order = api_form.save(commit=False)
-#                 order.user_profile = request.user
-#                 order.save()
+class Api_form_view(FormView):
+    form_class = AddApiKeyForm
+    template_name = 'addapi.html'
+    # success_url =
+
+    def form_valid(self, form):
+        form.instance.user_profile = self.request.user
+        return super().form_valid(form)
+    def post(self):
+        if self.request.method == "POST":
+            api_form = AddApiKeyForm(self.request.POST)
+            if api_form.is_valid():
+                order = api_form.save(commit=False)
+                order.user_profile = self.request.user
+                order.save()
+
+        api_form = AddApiKeyForm
+        context = {
+            'menu': menu,
+            'api_form': api_form
+        }
+        return render(self.request, 'addapi.html', context=context)
+
+# def api_form_view(request):
+#     if request.method == "POST":
+#         api_form = AddApiKeyForm(request.POST)
+#         if api_form.is_valid():
+#             order = api_form.save(commit=False)
+#             order.user_profile = request.user
+#             order.save()
 #
-#         api_form = AddApiKeyForm
-#         context = {
-#             'menu': menu,
-#             'api_form': api_form
-#         }
-#         return render(request, 'addapi.html', context=context)
-
-def api_form_view(request):
-    if request.method == "POST":
-        api_form = AddApiKeyForm(request.POST)
-        if api_form.is_valid():
-            order = api_form.save(commit=False)
-            order.user_profile = request.user
-            order.save()
-
-    api_form = AddApiKeyForm
-    context = {
-        'menu': menu,
-        'api_form': api_form
-    }
-    return render(request, 'addapi.html', context=context)
+#     api_form = AddApiKeyForm
+#     context = {
+#         'menu': menu,
+#         'api_form': api_form
+#     }
+#     return render(request, 'addapi.html', context=context)
 
 
 # class Api_view(LoginRequiredMixin, DataMixin, ListView):
