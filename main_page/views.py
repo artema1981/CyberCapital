@@ -5,7 +5,7 @@ from django.views import View
 from .models import Exchanges, AddApiKey
 from .forms import AddApiKeyForm
 from django.contrib.auth.models import User
-from django.views.generic import ListView, CreateView, FormView
+from django.views.generic import ListView, CreateView, FormView, UpdateView, DeleteView
 from .utils import *
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
@@ -44,29 +44,31 @@ class Exchanges_view(LoginRequiredMixin, DataMixin, ListView):
         return Exchanges.objects.filter(is_visible=True)
 
 
+#
+# class Api_form_view(LoginRequiredMixin, FormView):
+#     form_class = AddApiKeyForm
+#     template_name = 'addapi.html'
+#     success_url = 'addapi'
+#
+#     def get(self, request, *args, **kwargs):
+#         return self.render_to_response(self.get_context_data())
+#     def form_valid(self, form):
+#         form.instance.user_profile = self.request.user
+#         return super().form_valid(form)
+#
+#     def post(self, request, *args, **kwargs):
+#         if self.request.method == "POST":
+#             api_form = AddApiKeyForm(self.request.POST)
+#             if api_form.is_valid():
+#                 order = api_form.save(commit=False)
+#                 order.user_profile = self.request.user
+#                 order.save()
+#
+#     def get_context_data(self, **kwargs):
+#         kwargs['menu'] = menu
+#         return super().get_context_data(**kwargs)
 
-class Api_form_view(FormView):
-    form_class = AddApiKeyForm
-    template_name = 'addapi.html'
-    # success_url =
 
-    def form_valid(self, form):
-        form.instance.user_profile = self.request.user
-        return super().form_valid(form)
-    def post(self):
-        if self.request.method == "POST":
-            api_form = AddApiKeyForm(self.request.POST)
-            if api_form.is_valid():
-                order = api_form.save(commit=False)
-                order.user_profile = self.request.user
-                order.save()
-
-        api_form = AddApiKeyForm
-        context = {
-            'menu': menu,
-            'api_form': api_form
-        }
-        return render(self.request, 'addapi.html', context=context)
 
 # def api_form_view(request):
 #     if request.method == "POST":
@@ -83,14 +85,17 @@ class Api_form_view(FormView):
 #     }
 #     return render(request, 'addapi.html', context=context)
 
+class ApiCreateView(CreateView):
+    model = AddApiKey
+    fields = ['user_profile', 'exchange', 'api_key', 'secret_api_key']
 
-# class Api_view(LoginRequiredMixin, DataMixin, ListView):
-#     model = AddApiKey
-#     template_name = 'exchanges.html'
-#     context_object_name = 'api'
-#
-#     def get_queryset(self):
-#         return  AddApiKey.objects.all()#AddApiKey.objects.filter(user_profile=request.user)
+class ApiUpdateView(UpdateView):
+    model = AddApiKey
+    fields = ['user_profile', 'exchange', 'api_key', 'secret_api_key']
+
+class ApiDeleteView(DeleteView):
+    model = AddApiKey
+    success_url = reverse_lazy('api-list')
 
 
 
