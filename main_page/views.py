@@ -87,11 +87,18 @@ class Exchanges_view(LoginRequiredMixin, DataMixin, ListView):
 
 class ApiCreateView(CreateView):
     model = AddApiKey
-    fields = ['user_profile', 'exchange', 'api_key', 'secret_api_key']
+    fields = ['exchange', 'api_key', 'secret_api_key']
+    def form_valid(self, form):
+        order = form.save(commit=False)
+        order.user_profile = self.request.user
+        self.object = order.save()
+        return super().form_valid(form)
+
+
 
 class ApiUpdateView(UpdateView):
     model = AddApiKey
-    fields = ['user_profile', 'exchange', 'api_key', 'secret_api_key']
+    fields = ['exchange', 'api_key', 'secret_api_key']
     template_name_suffix = '_update_form'
 class ApiDeleteView(DeleteView):
     model = AddApiKey
