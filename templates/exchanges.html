@@ -14,16 +14,15 @@
           </tr>
           </thead>
           <tbody>
-
           {% for i in exchange_list %}
 
           <tr>
             <th scope="row">{{ i.exchange }}</th>
             <td>{{ i.api }}</td>
                 {% if i.api %}
-                  <td><a href="api/6">update</a></td>
+                  <td><a href="{% url 'api_update' i.api_pk %}">update</a></td>
                 {% else %}
-                  <td><a href="{% url 'api-add' %}">add</a></td>
+                  <td><a href="{% url 'api_add' %}">add</a></td>
                 {% endif %}
           <td>cjmnchm</td>
           </tr>

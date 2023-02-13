@@ -90,6 +90,7 @@ class Exchanges_view(LoginRequiredMixin, DataMixin, ListView):
 class ApiCreateView(CreateView):
     model = AddApiKey
     fields = ['exchange', 'api_key', 'secret_api_key']
+    success_url = reverse_lazy('exchanges')
     def form_valid(self, form):
         order = form.save(commit=False)
         order.user_profile = self.request.user
@@ -102,9 +103,11 @@ class ApiUpdateView(UpdateView):
     model = AddApiKey
     fields = ['api_key', 'secret_api_key']
     template_name_suffix = '_update_form'
+
+
 class ApiDeleteView(DeleteView):
     model = AddApiKey
-    success_url = reverse_lazy('api-list')
+    success_url = reverse_lazy('exchanges')
 
 
 
