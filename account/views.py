@@ -1,18 +1,13 @@
-from django.contrib.auth.views import LoginView, redirect_to_login
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
-from django.views import View
+from django.contrib.auth.views import LoginView
+from django.shortcuts import redirect
+from django.contrib.auth import logout
+from django.views.generic import ListView,  CreateView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse_lazy
 
 from main_page.utils import DataMixin
 from .forms import RegistrationForm, LoginForm
-from django.views.generic import ListView, DetailView, CreateView
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.urls import reverse_lazy
-from django.contrib.auth.forms import User, UserCreationForm
-from django.contrib.auth.decorators import login_required
 from .models import Profile
-
-
 
 
 class RegisterUser(DataMixin, CreateView):
@@ -38,14 +33,12 @@ class LoginUser(DataMixin, LoginView):
     def get_success_url(self):
         return reverse_lazy('home')
 
+
 def logout_view(request):
     logout(request)
     return redirect('/')
 
 
-# @login_required
-# def profile(request):
-#     return render(request, 'profile.html')
 class ProfilePage(LoginRequiredMixin, DataMixin, ListView):
     model = Profile
     template_name = 'profile.html'
@@ -54,7 +47,6 @@ class ProfilePage(LoginRequiredMixin, DataMixin, ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context(title='profile')
-        print(dict(list(context.items()) + list(c_def.items())))
         return dict(list(context.items()) + list(c_def.items()))
 
     def get_user_context(self, **kwargs):

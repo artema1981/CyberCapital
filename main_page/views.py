@@ -3,7 +3,6 @@ from django.urls import reverse_lazy
 from django.views import View
 
 from .models import Exchanges, AddApiKey
-from .forms import AddApiKeyForm
 from django.contrib.auth.models import User
 from django.views.generic import ListView, CreateView, FormView, UpdateView, DeleteView
 from .utils import *
@@ -42,11 +41,9 @@ class Exchanges_view(LoginRequiredMixin, DataMixin, ListView):
             for api in context['users_key']:
                 if api.exchange == exchange:
                     exchange_list[-1]['api'] = api.api_key
+                    exchange_list[-1]['api_pk'] = api.pk
         context['exchange_list'] = exchange_list
         return dict(list(context.items()) + list(c_def.items()))
-
-    # def get_queryset(self):
-    #     return Exchanges.objects.filter(is_visible=True)
 
 
 #
@@ -72,9 +69,9 @@ class Exchanges_view(LoginRequiredMixin, DataMixin, ListView):
 #     def get_context_data(self, **kwargs):
 #         kwargs['menu'] = menu
 #         return super().get_context_data(**kwargs)
-
-
-
+#
+#
+#
 # def api_form_view(request):
 #     if request.method == "POST":
 #         api_form = AddApiKeyForm(request.POST)
@@ -103,7 +100,7 @@ class ApiCreateView(CreateView):
 
 class ApiUpdateView(UpdateView):
     model = AddApiKey
-    fields = ['exchange', 'api_key', 'secret_api_key']
+    fields = ['api_key', 'secret_api_key']
     template_name_suffix = '_update_form'
 class ApiDeleteView(DeleteView):
     model = AddApiKey

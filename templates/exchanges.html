@@ -7,10 +7,10 @@
 
           <thead>
           <tr>
-            <th scope="col">exchanges</th>
-            <th scope="col">api</th>
-            <th scope="col">Last</th>
-            <th scope="col">Handle</th>
+            <th scope="col">Exchanges</th>
+            <th scope="col">API key</th>
+            <th scope="col">add/update API</th>
+            <th scope="col">ping</th>
           </tr>
           </thead>
           <tbody>
@@ -20,8 +20,12 @@
           <tr>
             <th scope="row">{{ i.exchange }}</th>
             <td>{{ i.api }}</td>
-            <td>456</td>
-            <td>@mdo</td>
+                {% if i.api %}
+                  <td><a href="api/6">update</a></td>
+                {% else %}
+                  <td><a href="{% url 'api-add' %}">add</a></td>
+                {% endif %}
+          <td>cjmnchm</td>
           </tr>
           {% endfor %}
 
