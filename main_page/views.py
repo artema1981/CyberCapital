@@ -36,12 +36,17 @@ class Exchanges_view(LoginRequiredMixin, DataMixin, ListView):
         c_def = self.get_user_context(title='exchanges')
         users_key = AddApiKey.objects.filter(user_profile_id=self.request.user.pk)
         context['users_key'] = users_key
-
-        print(dict(list(context.items()) + list(c_def.items())))
+        exchange_list = []
+        for exchange in context['exchanges']:
+            exchange_list.append({'exchange': exchange.name, 'api': None})
+            for api in context['users_key']:
+                if api.exchange == exchange:
+                    exchange_list[-1]['api'] = api.api_key
+        context['exchange_list'] = exchange_list
         return dict(list(context.items()) + list(c_def.items()))
 
-    def get_queryset(self):
-        return Exchanges.objects.filter(is_visible=True)
+    # def get_queryset(self):
+    #     return Exchanges.objects.filter(is_visible=True)
 
 
 #

@@ -4,23 +4,23 @@
 
         <div class="bd-example-snippet bd-code-snippet"><div class="bd-example">
         <table class="table table-striped">
-        <a>{{ api_dict }}</a>
+
           <thead>
           <tr>
-            <th scope="col">#</th>
-            <th scope="col">First</th>
+            <th scope="col">exchanges</th>
+            <th scope="col">api</th>
             <th scope="col">Last</th>
             <th scope="col">Handle</th>
           </tr>
           </thead>
           <tbody>
 
-          {% for i in users_key %}
+          {% for i in exchange_list %}
 
           <tr>
             <th scope="row">{{ i.exchange }}</th>
-            <td>{{ i.api_key}}</td>
-            <td>Otto</td>
+            <td>{{ i.api }}</td>
+            <td>456</td>
             <td>@mdo</td>
           </tr>
           {% endfor %}
