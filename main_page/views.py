@@ -37,7 +37,9 @@ class Exchanges_view(LoginRequiredMixin, DataMixin, ListView):
         context['users_key'] = users_key
         exchange_list = []
         for exchange in context['exchanges']:
-            exchange_list.append({'exchange': exchange.name, 'api': None})
+            exchange_list.append({'exchange': exchange,
+                                  'exchange_obj': context['exchanges'],
+                                  'api': None})
             for api in context['users_key']:
                 if api.exchange == exchange:
                     exchange_list[-1]['api'] = api.api_key
@@ -89,11 +91,14 @@ class Exchanges_view(LoginRequiredMixin, DataMixin, ListView):
 
 class ApiCreateView(CreateView):
     model = AddApiKey
-    fields = ['exchange', 'api_key', 'secret_api_key']
+    fields = ['api_key', 'secret_api_key']
     success_url = reverse_lazy('exchanges')
+
     def form_valid(self, form):
         order = form.save(commit=False)
+        get_exchange = Exchanges.objects.get(name=self.request.GET['name1'])
         order.user_profile = self.request.user
+        order.exchange = get_exchange
         self.object = order.save()
         return super().form_valid(form)
 
@@ -103,7 +108,7 @@ class ApiUpdateView(UpdateView):
     model = AddApiKey
     fields = ['api_key', 'secret_api_key']
     template_name_suffix = '_update_form'
-
+    success_url = reverse_lazy('exchanges')
 
 class ApiDeleteView(DeleteView):
     model = AddApiKey

@@ -22,7 +22,7 @@
                 {% if i.api %}
                   <td><a href="{% url 'api_update' i.api_pk %}">update</a></td>
                 {% else %}
-                  <td><a href="{% url 'api_add' %}">add</a></td>
+                  <td><a href="{% url 'api_add' %}?name1={{ i.exchange }}">add</a></td>
                 {% endif %}
           <td>cjmnchm</td>
           </tr>
