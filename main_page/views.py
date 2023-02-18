@@ -48,47 +48,6 @@ class Exchanges_view(LoginRequiredMixin, DataMixin, ListView):
         return dict(list(context.items()) + list(c_def.items()))
 
 
-#
-# class Api_form_view(LoginRequiredMixin, FormView):
-#     form_class = AddApiKeyForm
-#     template_name = 'addapi.html'
-#     success_url = 'addapi'
-#
-#     def get(self, request, *args, **kwargs):
-#         return self.render_to_response(self.get_context_data())
-#     def form_valid(self, form):
-#         form.instance.user_profile = self.request.user
-#         return super().form_valid(form)
-#
-#     def post(self, request, *args, **kwargs):
-#         if self.request.method == "POST":
-#             api_form = AddApiKeyForm(self.request.POST)
-#             if api_form.is_valid():
-#                 order = api_form.save(commit=False)
-#                 order.user_profile = self.request.user
-#                 order.save()
-#
-#     def get_context_data(self, **kwargs):
-#         kwargs['menu'] = menu
-#         return super().get_context_data(**kwargs)
-#
-#
-#
-# def api_form_view(request):
-#     if request.method == "POST":
-#         api_form = AddApiKeyForm(request.POST)
-#         if api_form.is_valid():
-#             order = api_form.save(commit=False)
-#             order.user_profile = request.user
-#             order.save()
-#
-#     api_form = AddApiKeyForm
-#     context = {
-#         'menu': menu,
-#         'api_form': api_form
-#     }
-#     return render(request, 'addapi.html', context=context)
-
 class ApiCreateView(CreateView):
     model = AddApiKey
     fields = ['api_key', 'secret_api_key']
@@ -103,18 +62,16 @@ class ApiCreateView(CreateView):
         return super().form_valid(form)
 
 
-
 class ApiUpdateView(UpdateView):
     model = AddApiKey
     fields = ['api_key', 'secret_api_key']
     template_name_suffix = '_update_form'
     success_url = reverse_lazy('exchanges')
 
+
 class ApiDeleteView(DeleteView):
     model = AddApiKey
     success_url = reverse_lazy('exchanges')
-
-
 
 
 class Balances(LoginRequiredMixin, DataMixin, ListView):

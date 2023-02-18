@@ -20,7 +20,11 @@
             <th scope="row">{{ i.exchange }}</th>
             <td>{{ i.api }}</td>
                 {% if i.api %}
-                  <td><a href="{% url 'api_update' i.api_pk %}">update</a></td>
+                  <td>
+                      <a href="{% url 'api_update' i.api_pk %}">update</a>
+                      <a> | </a>
+                      <a href="{% url 'api_delete' i.api_pk %}">delete</a>
+                  </td>
                 {% else %}
                   <td><a href="{% url 'api_add' %}?name1={{ i.exchange }}">add</a></td>
                 {% endif %}

@@ -1,6 +1,6 @@
 
-from binance.spot import Spot as Client
-from config import API_KEY, API_SECRET
+# from binance.spot import Spot as Client
+# from config import API_KEY, API_SECRET
 
 
 # client = Client(API_KEY, API_SECRET, base_url='https://api.binance.com')
