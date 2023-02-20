@@ -1,5 +1,6 @@
 from django.urls import path
-from .views import MainPage, Balances, Statistics,  Exchanges_view, ApiCreateView, ApiUpdateView, ApiDeleteView
+from .views import *
+
 urlpatterns = [
     path('balances/', Balances.as_view(), name='balances'),
     path('statistics/', Statistics.as_view(), name='statistics'),
@@ -8,5 +9,6 @@ urlpatterns = [
     path('api/', ApiCreateView.as_view(), name='api_add'),
     path('api/<int:pk>', ApiUpdateView.as_view(), name='api_update'),
     path('api/<int:pk>/delete', ApiDeleteView.as_view(), name='api_delete'),
+    path('exchanges/connect', Connect.as_view(), name='connect'),
 
 ]

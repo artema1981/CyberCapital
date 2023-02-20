@@ -24,3 +24,6 @@ class BinanceApi(ClientsData):
     def get_totalAssetOfBtc(self):
         totalAssetOfBtc = self.client.account_snapshot('SPOT')['snapshotVos'][0]['data']['totalAssetOfBtc']
         return totalAssetOfBtc
+
+    def save(self):
+        pass

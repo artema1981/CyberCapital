@@ -1,14 +1,14 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views import View
-
+from .clients_exch_data import BinanceApi
 from .models import Exchanges, AddApiKey
 from django.contrib.auth.models import User
 from django.views.generic import ListView, CreateView, FormView, UpdateView, DeleteView
 from .utils import *
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
-
+from django.http import HttpResponse
 
 # Create your views here.
 
@@ -32,7 +32,9 @@ class Exchanges_view(LoginRequiredMixin, DataMixin, ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
+        #update dict DatMixin
         c_def = self.get_user_context(title='exchanges')
+        #render list exchang/key for auth user
         users_key = AddApiKey.objects.filter(user_profile_id=self.request.user.pk)
         context['users_key'] = users_key
         exchange_list = []
@@ -45,7 +47,36 @@ class Exchanges_view(LoginRequiredMixin, DataMixin, ListView):
                     exchange_list[-1]['api'] = api.api_key
                     exchange_list[-1]['api_pk'] = api.pk
         context['exchange_list'] = exchange_list
+
         return dict(list(context.items()) + list(c_def.items()))
+
+
+
+# def connect(request):
+#     return HttpResponse("Привіт з Django!")
+
+class Connect(View):
+    # model = AddApiKey
+    # success_url = reverse_lazy('exchanges')
+
+    def get(self, request):
+        # Отримуємо значення кнопки з запиту
+        print(request.POST)
+        print(request.GET)
+        button_value = request.GET.get('exchange')
+
+
+
+        return redirect('exchanges')
+    # if button_value == 'create_instance':
+    #     # Створюємо екземпляр класу
+    #     my_instance = BinanceApi('1', '2', '3')
+    #
+    #     # Зберігаємо екземпляр класу
+    #     my_instance.save()
+    #
+    #     # Повертаємо відповідь клієнту
+    #     return HttpResponse('Екземпляр класу успішно створено')
 
 
 class ApiCreateView(CreateView):
@@ -55,9 +86,14 @@ class ApiCreateView(CreateView):
 
     def form_valid(self, form):
         order = form.save(commit=False)
-        get_exchange = Exchanges.objects.get(name=self.request.GET['name1'])
-        order.user_profile = self.request.user
+
+        # put in the form exchange id
+        get_exchange = Exchanges.objects.get(name=self.request.GET['exchange_id'])
         order.exchange = get_exchange
+
+        # put in the form users id
+        order.user_profile = self.request.user
+
         self.object = order.save()
         return super().form_valid(form)
 
@@ -98,3 +134,5 @@ class Statistics(LoginRequiredMixin, DataMixin, ListView):
 
     def get_queryset(self):
         return 'statistics'
+
+
