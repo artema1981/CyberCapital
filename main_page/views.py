@@ -9,7 +9,7 @@ from .utils import *
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.http import HttpResponse
-
+from .redis_db import *
 # Create your views here.
 
 class MainPage(DataMixin, ListView):
@@ -52,31 +52,25 @@ class Exchanges_view(LoginRequiredMixin, DataMixin, ListView):
 
 
 
-# def connect(request):
-#     return HttpResponse("Привіт з Django!")
-
 class Connect(View):
-    # model = AddApiKey
-    # success_url = reverse_lazy('exchanges')
+    model = AddApiKey
 
     def get(self, request):
-        # Отримуємо значення кнопки з запиту
-        print(request.POST)
-        print(request.GET)
-        button_value = request.GET.get('exchange')
+        exchange = request.GET.get('exchange')
+        if exchange == 'Binance':
+            user_pk = self.request.user.pk
+            api = AddApiKey.objects.get(pk=int(request.GET.get('api_pk')))
+            print(api.secret_api_key)
+            print(api.api_key)
+            client_instance = BinanceApi(user_pk, api.api_key, api.secret_api_key)
+            # set_redis(f'{user_pk}_{exchange}', 1234)
+            print(BinanceApi.connected_users.get(user_pk).get_balance_spot())
+            print(client_instance.client.session.__dict__)
 
-
+            # print(get_redis(f'{user_pk}_{exchange}'))
 
         return redirect('exchanges')
-    # if button_value == 'create_instance':
-    #     # Створюємо екземпляр класу
-    #     my_instance = BinanceApi('1', '2', '3')
-    #
-    #     # Зберігаємо екземпляр класу
-    #     my_instance.save()
-    #
-    #     # Повертаємо відповідь клієнту
-    #     return HttpResponse('Екземпляр класу успішно створено')
+
 
 
 class ApiCreateView(CreateView):

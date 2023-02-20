@@ -30,7 +30,7 @@
               {% endif %}
               <td>
 
-                      <a href="{% url 'connect' %}?connect_data={{ i.exchange }} {{ i.api_pk }}">connect</a>
+                      <a href="{% url 'connect' %}?exchange={{ i.exchange }}&api_pk={{ i.api_pk }}">connect</a>
 
               </td>
           </tr>
