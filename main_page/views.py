@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views import View
-from .clients_exch_data import BinanceApi
+from .clients_exch_data import *
 from .models import Exchanges, AddApiKey
 from django.contrib.auth.models import User
 from django.views.generic import ListView, CreateView, FormView, UpdateView, DeleteView
@@ -58,13 +58,19 @@ class Connect(View):
     model = AddApiKey
 
     def get(self, request):
+        ping_life = 30
         exchange = request.GET.get('exchange')
         if exchange == 'Binance':
             user_pk = self.request.user.pk
             api = AddApiKey.objects.get(pk=int(request.GET.get('api_pk')))
             client_instance = BinanceApi(user_pk, api.api_key, api.secret_api_key)
-            set_redis(f'{user_pk}_{exchange}', client_instance.test_ping(), ex=30)
+            set_redis(f'{user_pk}_{exchange}', client_instance.test_ping(), ex=ping_life)
 
+        elif exchange == 'Gate.io':
+            user_pk = self.request.user.pk
+            api = AddApiKey.objects.get(pk=int(request.GET.get('api_pk')))
+            client_instance = GateioApi(user_pk, api.api_key, api.secret_api_key)
+            set_redis(f'{user_pk}_{exchange}', client_instance.test_ping(), ex=ping_life)
         return redirect('exchanges')
 
 
