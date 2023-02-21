@@ -10,6 +10,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from .redis_db import *
+
+
 # Create your views here.
 
 class MainPage(DataMixin, ListView):
@@ -32,16 +34,17 @@ class Exchanges_view(LoginRequiredMixin, DataMixin, ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        #update dict DatMixin
+        # update dict DatMixin
         c_def = self.get_user_context(title='exchanges')
-        #render list exchang/key for auth user
+        # render list exchang/key for auth user
         users_key = AddApiKey.objects.filter(user_profile_id=self.request.user.pk)
         context['users_key'] = users_key
         exchange_list = []
         for exchange in context['exchanges']:
             exchange_list.append({'exchange': exchange,
                                   'exchange_obj': context['exchanges'],
-                                  'api': None})
+                                  'api': None,
+                                  'ping': get_redis(f'{self.request.user.pk}_{exchange.name}')})
             for api in context['users_key']:
                 if api.exchange == exchange:
                     exchange_list[-1]['api'] = api.api_key
@@ -49,7 +52,6 @@ class Exchanges_view(LoginRequiredMixin, DataMixin, ListView):
         context['exchange_list'] = exchange_list
 
         return dict(list(context.items()) + list(c_def.items()))
-
 
 
 class Connect(View):
@@ -60,17 +62,10 @@ class Connect(View):
         if exchange == 'Binance':
             user_pk = self.request.user.pk
             api = AddApiKey.objects.get(pk=int(request.GET.get('api_pk')))
-            print(api.secret_api_key)
-            print(api.api_key)
             client_instance = BinanceApi(user_pk, api.api_key, api.secret_api_key)
-            # set_redis(f'{user_pk}_{exchange}', 1234)
-            print(BinanceApi.connected_users.get(user_pk).get_balance_spot())
-            print(client_instance.client.session.__dict__)
-
-            # print(get_redis(f'{user_pk}_{exchange}'))
+            set_redis(f'{user_pk}_{exchange}', client_instance.test_ping(), ex=30)
 
         return redirect('exchanges')
-
 
 
 class ApiCreateView(CreateView):
@@ -128,5 +123,3 @@ class Statistics(LoginRequiredMixin, DataMixin, ListView):
 
     def get_queryset(self):
         return 'statistics'
-
-

@@ -9,8 +9,8 @@
           <tr>
             <th scope="col">Exchanges</th>
             <th scope="col">API key</th>
-            <th scope="col">add/update API</th>
             <th scope="col">ping</th>
+            <th scope="col">add/update API</th>
           </tr>
           </thead>
           <tbody>
@@ -21,18 +21,23 @@
               <td>{{ i.api }}</td>
               {% if i.api %}
                   <td>
+                        {% if i.ping %}
+                            <a>{{ i.ping }}</a>
+                        {% else %}
+                            <a href="{% url 'connect' %}?exchange={{ i.exchange }}&api_pk={{ i.api_pk }}">test ping</a>
+                        {% endif %}
+                  </td>
+
+                  <td>
                       <a href="{% url 'api_update' i.api_pk %}">update</a>
                       <a> | </a>
                       <a href="{% url 'api_delete' i.api_pk %}">delete</a>
                   </td>
               {% else %}
+                  <td><a>no connection</a></td>
                   <td><a href="{% url 'api_add' %}?exchange_id={{ i.exchange }}">add</a></td>
               {% endif %}
-              <td>
 
-                      <a href="{% url 'connect' %}?exchange={{ i.exchange }}&api_pk={{ i.api_pk }}">connect</a>
-
-              </td>
           </tr>
           {% endfor %}
 
