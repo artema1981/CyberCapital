@@ -39,7 +39,7 @@ class BinanceApi(ClientsData):
         lst_symbols = []
         ex_info = self.client.exchange_info()
         for i in ex_info['symbols']:
-            symbol = i['symbol']
+            symbol = {'symbol': i['symbol'], 'baseAsset': i['baseAsset'], 'quoteAsset':i['quoteAsset']}
             if i['isSpotTradingAllowed'] and i['status'] == 'TRADING':
                 lst_symbols.append(symbol)
         return lst_symbols
@@ -101,11 +101,10 @@ class GateioApi(ClientsData):
         host = "https://api.gateio.ws"
         prefix = "/api/v4"
         headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
-
         url = '/spot/currency_pairs'
         query_param = ''
         r = requests.request('GET', host + prefix + url, headers=headers)
-        res = [x['base']+x['quote'] for x in r.json()]
+        res = [{'symbol': x['base']+x['quote'], 'baseAsset': x['base'], 'quoteAsset': x['quote']} for x in r.json()]
         return res
 
 
@@ -143,7 +142,7 @@ class BybitApi(ClientsData):
         response = requests.get(url)
         if response.status_code == 200:
             symbols = response.json()["result"]
-            ticker_list = [symbol["name"] for symbol in symbols['list']]
+            ticker_list = [{ 'symbol': symbol["name"], 'baseAsset': symbol['baseCoin'], 'quoteAsset': symbol['quoteCoin']} for symbol in symbols['list']]
             return ticker_list
         else:
             return "Failed to retrieve ticker list."

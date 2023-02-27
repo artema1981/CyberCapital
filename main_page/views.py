@@ -55,8 +55,6 @@ class Exchanges_view(LoginRequiredMixin, DataMixin, ListView):
         return dict(list(context.items()) + list(c_def.items()))
 
 
-
-
 class ApiCreateView(CreateView):
     model = AddApiKey
     fields = ['api_key', 'secret_api_key']
@@ -100,10 +98,25 @@ class Connect(DataMixin, View):
         set_redis(f'{user_pk}_{exchange}', client_instance.test_ping(), ex=ping_life)
         return redirect('exchanges')
 
+
 def render_bunch(balances_lst, exchange_lst, all_symbols):
     all_balances = {}
     for i in range(len(exchange_lst)):
         all_balances[exchange_lst[i]] = balances_lst[i]
+
+    n = len(exchange_lst)
+    x = 0
+
+    def close(coin):
+        for i in range(x, n):
+            for coin2 in all_balances[exchange_lst[i]]:
+                pass#print(coin, coin2)
+
+    for i in range(n - 1):
+        x += 1
+        for coin in all_balances[exchange_lst[i]]:
+            close(coin)
+
     #
     # for i in range(len(exchange_lst)-1):
     #     for coin in all_balances[exchange_lst[i]]:
@@ -120,11 +133,10 @@ def render_bunch(balances_lst, exchange_lst, all_symbols):
     # #
     # # exchange_lst
 
+    # print(all_balances)
+    # print(exchange_lst)
+    # print(all_symbols['Gate.io'])
 
-
-    print(all_balances)
-    print(exchange_lst)
-    print(all_symbols)
 
 class Balances(LoginRequiredMixin, DataMixin, ListView):
     template_name = 'balances.html'
@@ -137,7 +149,7 @@ class Balances(LoginRequiredMixin, DataMixin, ListView):
         connect_data = AddApiKey.objects.filter(user_profile_id=self.request.user.pk)
         if not connect_data:
             return '<h3>You have not any one connected  exchange</h3>'
-        all_symbols = {} #{'Binance': ['ETHBTC', 'LTCBTC'..., 'Bybit': [['ETHBTC', 'LTCBTC'...,
+        all_symbols = {}  # {'Binance': ['ETHBTC', 'LTCBTC'..., 'Bybit': [['ETHBTC', 'LTCBTC'...,
         exchange_lst = []
         balances_lst = []
         set_coins = set()
@@ -151,21 +163,18 @@ class Balances(LoginRequiredMixin, DataMixin, ListView):
             all_symbols[i.exchange.name] = client_instance.get_all_symbols_list()
         coins_list = list(set_coins)
 
-
         render_bunch(balances_lst, exchange_lst, all_symbols)
 
-
-        df_list =[]
+        df_list = []
         for i in range(len(exchange_lst)):
             bal_dict_s = pd.Series(data=balances_lst[i], index=coins_list)
             df_list.append(pd.DataFrame({'coin': coins_list,
-                                          exchange_lst[i]: bal_dict_s.values}))
+                                         exchange_lst[i]: bal_dict_s.values}))
         res = df_list[0]
         if len(df_list) > 1:
             for i in range(1, len(df_list)):
                 res = res.join(df_list[i].set_index('coin'), on='coin')
         return res
-
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -179,6 +188,7 @@ class Balances(LoginRequiredMixin, DataMixin, ListView):
     def get_queryset(self):
         return 'balance.objects.filter(is_visible=True)'
 
+
 class Statistics(LoginRequiredMixin, DataMixin, ListView):
     template_name = 'statistics.html'
     context_object_name = 'statistics'
@@ -190,6 +200,7 @@ class Statistics(LoginRequiredMixin, DataMixin, ListView):
 
     def get_queryset(self):
         return 'statistics'
+
 
 class Bunches_view(LoginRequiredMixin, DataMixin, ListView):
     template_name = 'bunches.html'
