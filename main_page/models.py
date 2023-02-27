@@ -36,7 +36,7 @@ class AddApiKey(models.Model):
     secret_api_key = models.CharField(max_length=250)
 
     def __str__(self):
-        return f'user: {self.user_profile.pk} exchange: {self.exchange} api_key:{self.api_key} secret_api_key{self.secret_api_key}'
+        return f'user: {self.user_profile.pk} exchange: {self.exchange} api_key:{self.api_key} secret_api_key:{self.secret_api_key}'
 
     def get_absolute_url(self):
         return reverse('api_update', kwargs={'pk': self.pk})
