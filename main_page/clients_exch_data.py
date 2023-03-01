@@ -17,6 +17,9 @@ class ClientsData:
     def get_all_symbols_list(self):
         return 'pass'
 
+    def get_balance_spot_simulator(self):
+        return
+
 class BinanceApi(ClientsData):
 
     def __init__(self, user_pk, api_key, secret_key):
@@ -127,7 +130,7 @@ class BybitApi(ClientsData):
 
     def __init__(self, user_pk, api_key, secret_key):
         super().__init__(user_pk, api_key, secret_key)
-        self.client = spot.HTTP(api_key=api_key, api_secret=secret_key, endpoint='https://api-testnet.bybit.com')
+        self.client = spot.HTTP(api_key=api_key, api_secret=secret_key, endpoint='https://api.bybit.com')
 
     def get_balance_spot(self):
         balance = self.client.get_wallet_balance()['result']['balances']

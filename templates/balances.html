@@ -1,9 +1,75 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="container">
-<a> </a>
     {% autoescape off  %}
         {{ balance_chart }}
     {% endautoescape %}
 </div>
+
+
+        <div class="container">
+        <div class="bd-example-snippet bd-code-snippet"><div class="bd-example">
+        <table class="table table-striped">
+
+          <thead>
+          <tr>
+            <th scope="col">exchange</th>
+            <th scope="col">coin</th>
+            <th scope="col">free</th>
+              <th scope="col"><--symbol--></th>
+              <th scope="col">free</th>
+              <th scope="col">coin</th>
+              <th scope="col">exchange</th>
+          </tr>
+          </thead>
+          <tbody>
+          {% for x, y in bunches_list %}
+          <tr>
+          <td>
+              <h5>{{ x.exchange }}</h5>
+          </td>
+          <td>
+              {{ x.coin }}
+          </td>
+          <td>
+              {{ x.free }}
+          </td>
+           <td>
+              <h6><---{{ x.node.symbol }}---></h6>
+          </td>
+          <td>
+              {{ y.free }}
+          </td>
+          <td>
+              {{ y.coin }}
+          </td>
+          <td>
+              <h5>{{ y.exchange }}</h5>
+          </td>
+        </tr>
+
+          {% endfor %}
+
+
+
+            <!--
+          <tr>
+            <th scope="row">2</th>
+            <td>Jacob</td>
+            <td>Thornton</td>
+            <td>@fat</td>
+          </tr>
+          <tr>
+            <th scope="row">3</th>
+            <td colspan="2">Larry the Bird</td>
+            <td>@twitter</td>
+          </tr>
+          -->
+          </tbody>
+
+        </table>
+        </div></div>
+
+
+    </div>
 {% endblock %}

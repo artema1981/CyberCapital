@@ -99,49 +99,51 @@ class Connect(DataMixin, View):
         return redirect('exchanges')
 
 
-def render_bunch(balances_lst, exchange_lst, all_symbols):
-    all_balances = {}
-    for i in range(len(exchange_lst)):
-        all_balances[exchange_lst[i]] = balances_lst[i]
 
-    n = len(exchange_lst)
-    x = 0
 
-    def close(coin):
-        for i in range(x, n):
-            for coin2 in all_balances[exchange_lst[i]]:
-                pass#print(coin, coin2)
-
-    for i in range(n - 1):
-        x += 1
-        for coin in all_balances[exchange_lst[i]]:
-            close(coin)
-
-    #
-    # for i in range(len(exchange_lst)-1):
-    #     for coin in all_balances[exchange_lst[i]]:
-    #
-    #         for coin2 in all_balances[exchange_lst[i+1]]:
-    #             pass
-    #         print(all_balances[exchange_lst[i]])
-    #         print(all_balances[exchange_lst[i+1]])
-    #
-    # #             if coin+coin2 in all_symbols[exchange_lst[i]] and coin+coin2 in all_symbols[exchange_lst[i+1]]:
-    # #                 bunch = f'''{exchange_lst[i]}: {coin} {all_balances[exchange_lst[i]][coin]} /
-    # #                 {exchange_lst[i+1]}: {coin2} {all_balances[exchange_lst[i+1]][coin2]} '''
-    # #                 print(bunch)#coin+coin2,  all_balances[exchange_lst[i]][coin], all_balances[exchange_lst[i+1]][coin2])
-    # #
-    # # exchange_lst
-
-    # print(all_balances)
-    # print(exchange_lst)
-    # print(all_symbols['Gate.io'])
 
 
 class Balances(LoginRequiredMixin, DataMixin, ListView):
     template_name = 'balances.html'
     context_object_name = 'balances'
 
+    @staticmethod
+    def render_bunch(balances_lst, exchange_lst, all_symbols):
+        all_balances = {}
+        for i in range(len(exchange_lst)):
+            all_balances[exchange_lst[i]] = balances_lst[i]
+        n = len(exchange_lst)
+        x = 0
+        bunches_list = []
+        bunches_dict = {}
+
+        def close(coin, exchange):
+            for i in range(x, n):
+                for coin2 in all_balances[exchange_lst[i]]:
+                    f1_coin = list(
+                        filter(lambda x: x['baseAsset'] == coin and x['quoteAsset'] == coin2, all_symbols[exchange]))
+                    f2_coin = list(
+                        filter(lambda x: x['baseAsset'] == coin2 and x['quoteAsset'] == coin, all_symbols[exchange]))
+                    node1 = f1_coin if f1_coin else f2_coin
+
+                    f1_coin2 = list(filter(lambda x: x['baseAsset'] == coin and x['quoteAsset'] == coin2,
+                                           all_symbols[exchange_lst[i]]))
+                    f2_coin2 = list(filter(lambda x: x['baseAsset'] == coin2 and x['quoteAsset'] == coin,
+                                           all_symbols[exchange_lst[i]]))
+                    node2 = f1_coin2 if list(f1_coin2) else f2_coin2
+                    if node1 and node2:
+                        res = [{'exchange': exchange, 'coin': coin, 'free': all_balances[exchange][coin],
+                                'node': node1[0]},
+                               {'exchange': exchange_lst[i], 'coin': coin2,
+                                'free': all_balances[exchange_lst[i]][coin2], 'node': node2[0]}]
+                        bunches_list.append(res)  # exchange, (coin, coin2), exchange_lst[i])
+
+        for i in range(n - 1):
+            x += 1
+            for coin in all_balances[exchange_lst[i]]:
+                close(coin, exchange_lst[i])
+
+        return bunches_list
     def get_balances(self):
         """
         Chart balances all accounts
@@ -163,7 +165,10 @@ class Balances(LoginRequiredMixin, DataMixin, ListView):
             all_symbols[i.exchange.name] = client_instance.get_all_symbols_list()
         coins_list = list(set_coins)
 
-        render_bunch(balances_lst, exchange_lst, all_symbols)
+        bunches_list = Balances.render_bunch(balances_lst, exchange_lst, all_symbols)
+        # for i in bunches_list:
+        #     print(i)
+
 
         df_list = []
         for i in range(len(exchange_lst)):
@@ -174,19 +179,20 @@ class Balances(LoginRequiredMixin, DataMixin, ListView):
         if len(df_list) > 1:
             for i in range(1, len(df_list)):
                 res = res.join(df_list[i].set_index('coin'), on='coin')
-        return res
+        return {'balance_chart': res, 'bunches_list': bunches_list}
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context(title='balances')
         if isinstance(self.get_balances(), str):
-            context['balance_chart'] = self.get_balances()
+            context['balance_chart'] = self.get_balances()['balance_chart']
         else:
-            context['balance_chart'] = self.get_balances().to_html()
+            context['balance_chart'] = self.get_balances()['balance_chart'].to_html()
+            context['bunches_list'] = self.get_balances()['bunches_list']
         return dict(list(context.items()) + list(c_def.items()))
 
     def get_queryset(self):
-        return 'balance.objects.filter(is_visible=True)'
+        return 'balances'
 
 
 class Statistics(LoginRequiredMixin, DataMixin, ListView):
