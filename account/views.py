@@ -1,7 +1,7 @@
 from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect
 from django.contrib.auth import logout
-from django.views.generic import ListView,  CreateView
+from django.views.generic import ListView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 
@@ -51,3 +51,9 @@ class ProfilePage(LoginRequiredMixin, DataMixin, ListView):
 
     def get_user_context(self, **kwargs):
         return super(ProfilePage, self).get_user_context(**kwargs)
+
+class BioUpdateView(UpdateView):
+    model = Profile
+    fields = ['bio']
+    template_name_suffix = '_update_form'
+    success_url = reverse_lazy('profile')

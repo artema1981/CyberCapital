@@ -2,8 +2,9 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
+import redis
 
-
+redis_client = redis.Redis(host='localhost', port=6379, db=0)
 def main():
     """Run administrative tasks."""
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'CryptoTrade.settings')
@@ -19,5 +20,6 @@ def main():
 
 
 if __name__ == '__main__':
+    redis_client.flushall()
     main()
 

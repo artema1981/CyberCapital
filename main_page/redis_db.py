@@ -3,8 +3,8 @@ import redis
 redis_client = redis.Redis(host='localhost', port=6379, db=0)
 
 
-def set_redis(name, volue, **kwargs):
-    redis_client.set(name=name, value=volue, **kwargs)
+def set_redis(name, value, **kwargs):
+    redis_client.set(name=name, value=value, **kwargs)
 
 
 def get_redis(name):

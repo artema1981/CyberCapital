@@ -1,183 +1,105 @@
+from asgiref.sync import async_to_sync
+from binance.websocket.spot.websocket_client import SpotWebsocketClient as Client
+from .redis_db import *
+from pybit import spot
+import threading
+import asyncio
+from gate_ws import Configuration, Connection, WebSocketResponse
+from gate_ws.spot import SpotPublicTradeChannel, SpotBookTickerChannel
 
-# from binance.spot import Spot as Client
-# from config import API_KEY, API_SECRET
+
+#########____binance websocket____#################
+def message_handler(message):
+    if message.get('stream'):
+        symbol = 'binance_' + message['data'].get('s')
+        bid = message['data'].get('b')
+        ask = message['data'].get('a')
+        bidask = f'{bid},{ask}'
+        print(symbol, bidask)
+        set_redis(name=symbol, value=bidask)
 
 
-# client = Client(API_KEY, API_SECRET, base_url='https://api.binance.com')
-
-# account_snapshot = client.account_snapshot('SPOT')
-
+my_client = Client()
+my_client.start()
 
 
-# acc_snap_shot_dict = {'code': 200, 'msg': '', 'snapshotVos': [{'type': 'spot', 'updateTime': 1674863999000, 'data': {'totalAssetOfBtc': '0.00310831', 'balances': [{'asset': 'ADA', 'free': '0.067', 'locked': '0'}, {'asset': 'AION', 'free': '5.994', 'locked': '0'}, {'asset': 'ALCX', 'free': '0', 'locked': '0'}, {'asset': 'ALICE', 'free': '0', 'locked': '0'}, {'asset': 'API3', 'free': '0', 'locked': '0'}, {'asset': 'ARN', 'free': '0', 'locked': '0'}, {'asset': 'ATM', 'free': '0', 'locked': '0'}, {'asset': 'AUD', 'free': '0.6811', 'locked': '0'}, {'asset': 'AXS', 'free': '0', 'locked': '0'}, {'asset': 'BNB', 'free': '0.0280778', 'locked': '0'}, {'asset': 'BTC', 'free': '0.00001737', 'locked': '0'}, {'asset': 'BTS', 'free': '0', 'locked': '0'}, {'asset': 'BTT', 'free': '0', 'locked': '0'}, {'asset': 'BTTC', 'free': '1355102.7', 'locked': '0'}, {'asset': 'BUSD', 'free': '1.02272267', 'locked': '0'}, {'asset': 'CDT', 'free': '0', 'locked': '0'}, {'asset': 'CELR', 'free': '0', 'locked': '0'}, {'asset': 'CHZ', 'free': '0', 'locked': '0'}, {'asset': 'CND', 'free': '0.615', 'locked': '0'}, {'asset': 'COMP', 'free': '0', 'locked': '0'}, {'asset': 'CRV', 'free': '0.004', 'locked': '0'}, {'asset': 'DASH', 'free': '0', 'locked': '0'}, {'asset': 'DATA', 'free': '0', 'locked': '0'}, {'asset': 'DENT', 'free': '0', 'locked': '0'}, {'asset': 'DF', 'free': '0', 'locked': '0'}, {'asset': 'DLT', 'free': '44.955', 'locked': '0'}, {'asset': 'DON', 'free': '0.0305648', 'locked': '0'}, {'asset': 'DREP', 'free': '0', 'locked': '0'}, {'asset': 'EDG', 'free': '20.32859611', 'locked': '0'}, {'asset': 'ETH', 'free': '0.00000876', 'locked': '0'}, {'asset': 'ETHW', 'free': '0.00000876', 'locked': '0'}, {'asset': 'FET', 'free': '0', 'locked': '0'}, {'asset': 'FIDA', 'free': '0', 'locked': '0'}, {'asset': 'GAS', 'free': '0.0991151', 'locked': '0'}, {'asset': 'GBP', 'free': '0.0356', 'locked': '0'}, {'asset': 'GMT', 'free': '0', 'locked': '0'}, {'asset': 'GTO', 'free': '86.831', 'locked': '0'}, {'asset': 'HFT', 'free': '0', 'locked': '0'}, {'asset': 'ICX', 'free': '0.0046', 'locked': '0'}, {'asset': 'IOST', 'free': '250', 'locked': '0'}, {'asset': 'IOTA', 'free': '0.852', 'locked': '0'}, {'asset': 'JST', 'free': '12.60668216', 'locked': '0'}, {'asset': 'KMD', 'free': '0', 'locked': '0'}, {'asset': 'KSM', 'free': '0', 'locked': '0'}, {'asset': 'LINK', 'free': '0', 'locked': '0'}, {'asset': 'LTC', 'free': '0.00000341', 'locked': '0'}, {'asset': 'LUNA', 'free': '0', 'locked': '0'}, {'asset': 'MAGIC', 'free': '0', 'locked': '0'}, {'asset': 'MANA', 'free': '0.037', 'locked': '0'}, {'asset': 'MOVR', 'free': '0.001', 'locked': '0'}, {'asset': 'MTL', 'free': '0', 'locked': '0'}, {'asset': 'MULTI', 'free': '0', 'locked': '0'}, {'asset': 'NEBL', 'free': '0.00348', 'locked': '0'}, {'asset': 'NEO', 'free': '0.000556', 'locked': '0'}, {'asset': 'NKN', 'free': '0', 'locked': '0'}, {'asset': 'OCEAN', 'free': '0', 'locked': '0'}, {'asset': 'OMG', 'free': '0.0076', 'locked': '0'}, {'asset': 'ONE', 'free': '0', 'locked': '0'}, {'asset': 'ONG', 'free': '0.15674913', 'locked': '0'}, {'asset': 'ONT', 'free': '0.6747112', 'locked': '0'}, {'asset': 'PSG', 'free': '0', 'locked': '0'}, {'asset': 'QTUM', 'free': '0.00584', 'locked': '0'}, {'asset': 'REN', 'free': '0', 'locked': '0'}, {'asset': 'RVN', 'free': '29.8', 'locked': '0'}, {'asset': 'SAND', 'free': '0', 'locked': '0'}, {'asset': 'SNT', 'free': '0.869', 'locked': '0'}, {'asset': 'SNX', 'free': '0', 'locked': '0'}, {'asset': 'SSV', 'free': '0.00728', 'locked': '0'}, {'asset': 'STRAX', 'free': '0.0014', 'locked': '0'}, {'asset': 'SUSHI', 'free': '0', 'locked': '0'}, {'asset': 'SXP', 'free': '0.02428066', 'locked': '0'}, {'asset': 'SYS', 'free': '0', 'locked': '0'}, {'asset': 'TLM', 'free': '0', 'locked': '0'}, {'asset': 'TOMO', 'free': '0', 'locked': '0'}, {'asset': 'TRX', 'free': '22.90672753', 'locked': '0'}, {'asset': 'UNFI', 'free': '0', 'locked': '0'}, {'asset': 'USDT', 'free': '51.68460825', 'locked': '0'}, {'asset': 'VET', 'free': '0', 'locked': '0'}, {'asset': 'VGX', 'free': '0', 'locked': '0'}, {'asset': 'VTHO', 'free': '0.80370608', 'locked': '0'}, {'asset': 'WAVES', 'free': '0.00598331', 'locked': '0'}, {'asset': 'WIN', 'free': '1093.98974995', 'locked': '0'}, {'asset': 'XEM', 'free': '8', 'locked': '0'}, {'asset': 'XLM', 'free': '0.08315474', 'locked': '0'}, {'asset': 'XRP', 'free': '0.285', 'locked': '0'}, {'asset': 'XVG', 'free': '0.2', 'locked': '0'}, {'asset': 'ZIL', 'free': '0', 'locked': '0'}, {'asset': 'ZRX', 'free': '0', 'locked': '0'}]}}, {'type': 'spot', 'updateTime': 1674950399000, 'data': {'totalAssetOfBtc': '0.00310262', 'balances': [{'asset': 'ADA', 'free': '0.067', 'locked': '0'}, {'asset': 'AION', 'free': '5.994', 'locked': '0'}, {'asset': 'ALCX', 'free': '0', 'locked': '0'}, {'asset': 'ALICE', 'free': '0', 'locked': '0'}, {'asset': 'API3', 'free': '0', 'locked': '0'}, {'asset': 'ARN', 'free': '0', 'locked': '0'}, {'asset': 'ATM', 'free': '0', 'locked': '0'}, {'asset': 'AUD', 'free': '0.6811', 'locked': '0'}, {'asset': 'AXS', 'free': '0', 'locked': '0'}, {'asset': 'BNB', 'free': '0.0280778', 'locked': '0'}, {'asset': 'BTC', 'free': '0.00001737', 'locked': '0'}, {'asset': 'BTS', 'free': '0', 'locked': '0'}, {'asset': 'BTT', 'free': '0', 'locked': '0'}, {'asset': 'BTTC', 'free': '1355102.7', 'locked': '0'}, {'asset': 'BUSD', 'free': '1.02272267', 'locked': '0'}, {'asset': 'CDT', 'free': '0', 'locked': '0'}, {'asset': 'CELR', 'free': '0', 'locked': '0'}, {'asset': 'CHZ', 'free': '0', 'locked': '0'}, {'asset': 'CND', 'free': '0.615', 'locked': '0'}, {'asset': 'COMP', 'free': '0', 'locked': '0'}, {'asset': 'CRV', 'free': '0.004', 'locked': '0'}, {'asset': 'DASH', 'free': '0', 'locked': '0'}, {'asset': 'DATA', 'free': '0', 'locked': '0'}, {'asset': 'DENT', 'free': '0', 'locked': '0'}, {'asset': 'DF', 'free': '0', 'locked': '0'}, {'asset': 'DLT', 'free': '44.955', 'locked': '0'}, {'asset': 'DON', 'free': '0.0305648', 'locked': '0'}, {'asset': 'DREP', 'free': '0', 'locked': '0'}, {'asset': 'EDG', 'free': '20.32859611', 'locked': '0'}, {'asset': 'ETH', 'free': '0.00000876', 'locked': '0'}, {'asset': 'ETHW', 'free': '0.00000876', 'locked': '0'}, {'asset': 'FET', 'free': '0', 'locked': '0'}, {'asset': 'FIDA', 'free': '0', 'locked': '0'}, {'asset': 'GAS', 'free': '0.0991151', 'locked': '0'}, {'asset': 'GBP', 'free': '0.0356', 'locked': '0'}, {'asset': 'GMT', 'free': '0', 'locked': '0'}, {'asset': 'GTO', 'free': '86.831', 'locked': '0'}, {'asset': 'HFT', 'free': '0', 'locked': '0'}, {'asset': 'ICX', 'free': '0.0046', 'locked': '0'}, {'asset': 'IOST', 'free': '250', 'locked': '0'}, {'asset': 'IOTA', 'free': '0.852', 'locked': '0'}, {'asset': 'JST', 'free': '12.60668216', 'locked': '0'}, {'asset': 'KMD', 'free': '0', 'locked': '0'}, {'asset': 'KSM', 'free': '0', 'locked': '0'}, {'asset': 'LINK', 'free': '0', 'locked': '0'}, {'asset': 'LTC', 'free': '0.00000341', 'locked': '0'}, {'asset': 'LUNA', 'free': '0', 'locked': '0'}, {'asset': 'MAGIC', 'free': '0', 'locked': '0'}, {'asset': 'MANA', 'free': '0.037', 'locked': '0'}, {'asset': 'MOVR', 'free': '0.001', 'locked': '0'}, {'asset': 'MTL', 'free': '0', 'locked': '0'}, {'asset': 'MULTI', 'free': '0', 'locked': '0'}, {'asset': 'NEBL', 'free': '0.00348', 'locked': '0'}, {'asset': 'NEO', 'free': '0.000556', 'locked': '0'}, {'asset': 'NKN', 'free': '0', 'locked': '0'}, {'asset': 'OCEAN', 'free': '0', 'locked': '0'}, {'asset': 'OMG', 'free': '0.0076', 'locked': '0'}, {'asset': 'ONE', 'free': '0', 'locked': '0'}, {'asset': 'ONG', 'free': '0.15674913', 'locked': '0'}, {'asset': 'ONT', 'free': '0.6747112', 'locked': '0'}, {'asset': 'PSG', 'free': '0', 'locked': '0'}, {'asset': 'QTUM', 'free': '0.00584', 'locked': '0'}, {'asset': 'REN', 'free': '0', 'locked': '0'}, {'asset': 'RVN', 'free': '29.8', 'locked': '0'}, {'asset': 'SAND', 'free': '0', 'locked': '0'}, {'asset': 'SNT', 'free': '0.869', 'locked': '0'}, {'asset': 'SNX', 'free': '0', 'locked': '0'}, {'asset': 'SSV', 'free': '0.00728', 'locked': '0'}, {'asset': 'STRAX', 'free': '0.0014', 'locked': '0'}, {'asset': 'SUSHI', 'free': '0', 'locked': '0'}, {'asset': 'SXP', 'free': '0.02428066', 'locked': '0'}, {'asset': 'SYS', 'free': '0', 'locked': '0'}, {'asset': 'TLM', 'free': '0', 'locked': '0'}, {'asset': 'TOMO', 'free': '0', 'locked': '0'}, {'asset': 'TRX', 'free': '22.90672753', 'locked': '0'}, {'asset': 'UNFI', 'free': '0', 'locked': '0'}, {'asset': 'USDT', 'free': '51.68460825', 'locked': '0'}, {'asset': 'VET', 'free': '0', 'locked': '0'}, {'asset': 'VGX', 'free': '0', 'locked': '0'}, {'asset': 'VTHO', 'free': '0.80370608', 'locked': '0'}, {'asset': 'WAVES', 'free': '0.00598331', 'locked': '0'}, {'asset': 'WIN', 'free': '1093.98974995', 'locked': '0'}, {'asset': 'XEM', 'free': '8', 'locked': '0'}, {'asset': 'XLM', 'free': '0.08315474', 'locked': '0'}, {'asset': 'XRP', 'free': '0.285', 'locked': '0'}, {'asset': 'XVG', 'free': '0.2', 'locked': '0'}, {'asset': 'ZIL', 'free': '0', 'locked': '0'}, {'asset': 'ZRX', 'free': '0', 'locked': '0'}]}}, {'type': 'spot', 'updateTime': 1675036799000, 'data': {'totalAssetOfBtc': '0.00303084', 'balances': [{'asset': 'ADA', 'free': '0.067', 'locked': '0'}, {'asset': 'AION', 'free': '5.994', 'locked': '0'}, {'asset': 'ALCX', 'free': '0', 'locked': '0'}, {'asset': 'ALICE', 'free': '0', 'locked': '0'}, {'asset': 'API3', 'free': '0', 'locked': '0'}, {'asset': 'ARN', 'free': '0', 'locked': '0'}, {'asset': 'ATM', 'free': '0', 'locked': '0'}, {'asset': 'AUD', 'free': '0.6811', 'locked': '0'}, {'asset': 'AXS', 'free': '0', 'locked': '0'}, {'asset': 'BNB', 'free': '0.0280778', 'locked': '0'}, {'asset': 'BTC', 'free': '0.00001737', 'locked': '0'}, {'asset': 'BTS', 'free': '0', 'locked': '0'}, {'asset': 'BTT', 'free': '0', 'locked': '0'}, {'asset': 'BTTC', 'free': '1355102.7', 'locked': '0'}, {'asset': 'BUSD', 'free': '1.02272267', 'locked': '0'}, {'asset': 'CDT', 'free': '0', 'locked': '0'}, {'asset': 'CELR', 'free': '0', 'locked': '0'}, {'asset': 'CHZ', 'free': '0', 'locked': '0'}, {'asset': 'CND', 'free': '0.615', 'locked': '0'}, {'asset': 'COMP', 'free': '0', 'locked': '0'}, {'asset': 'CRV', 'free': '0.004', 'locked': '0'}, {'asset': 'DASH', 'free': '0', 'locked': '0'}, {'asset': 'DATA', 'free': '0', 'locked': '0'}, {'asset': 'DENT', 'free': '0', 'locked': '0'}, {'asset': 'DF', 'free': '0', 'locked': '0'}, {'asset': 'DLT', 'free': '44.955', 'locked': '0'}, {'asset': 'DON', 'free': '0.0305648', 'locked': '0'}, {'asset': 'DREP', 'free': '0', 'locked': '0'}, {'asset': 'EDG', 'free': '20.32859611', 'locked': '0'}, {'asset': 'ETH', 'free': '0.00000876', 'locked': '0'}, {'asset': 'ETHW', 'free': '0.00000876', 'locked': '0'}, {'asset': 'FET', 'free': '0', 'locked': '0'}, {'asset': 'FIDA', 'free': '0', 'locked': '0'}, {'asset': 'GAS', 'free': '0.0991151', 'locked': '0'}, {'asset': 'GBP', 'free': '0.0356', 'locked': '0'}, {'asset': 'GMT', 'free': '0', 'locked': '0'}, {'asset': 'GTO', 'free': '86.831', 'locked': '0'}, {'asset': 'HFT', 'free': '0', 'locked': '0'}, {'asset': 'ICX', 'free': '0.0046', 'locked': '0'}, {'asset': 'IOST', 'free': '250', 'locked': '0'}, {'asset': 'IOTA', 'free': '0.852', 'locked': '0'}, {'asset': 'JST', 'free': '12.60668216', 'locked': '0'}, {'asset': 'KMD', 'free': '0', 'locked': '0'}, {'asset': 'KSM', 'free': '0', 'locked': '0'}, {'asset': 'LINK', 'free': '0', 'locked': '0'}, {'asset': 'LTC', 'free': '0.00000341', 'locked': '0'}, {'asset': 'LUNA', 'free': '0', 'locked': '0'}, {'asset': 'MAGIC', 'free': '0', 'locked': '0'}, {'asset': 'MANA', 'free': '0.037', 'locked': '0'}, {'asset': 'MOVR', 'free': '0.001', 'locked': '0'}, {'asset': 'MTL', 'free': '0', 'locked': '0'}, {'asset': 'MULTI', 'free': '0', 'locked': '0'}, {'asset': 'NEBL', 'free': '0.00348', 'locked': '0'}, {'asset': 'NEO', 'free': '0.000556', 'locked': '0'}, {'asset': 'NKN', 'free': '0', 'locked': '0'}, {'asset': 'OCEAN', 'free': '0', 'locked': '0'}, {'asset': 'OMG', 'free': '0.0076', 'locked': '0'}, {'asset': 'ONE', 'free': '0', 'locked': '0'}, {'asset': 'ONG', 'free': '0.15674913', 'locked': '0'}, {'asset': 'ONT', 'free': '0.6747112', 'locked': '0'}, {'asset': 'PSG', 'free': '0', 'locked': '0'}, {'asset': 'QTUM', 'free': '0.00584', 'locked': '0'}, {'asset': 'REN', 'free': '0', 'locked': '0'}, {'asset': 'RVN', 'free': '29.8', 'locked': '0'}, {'asset': 'SAND', 'free': '0', 'locked': '0'}, {'asset': 'SNT', 'free': '0.869', 'locked': '0'}, {'asset': 'SNX', 'free': '0', 'locked': '0'}, {'asset': 'SSV', 'free': '0.00728', 'locked': '0'}, {'asset': 'STRAX', 'free': '0.0014', 'locked': '0'}, {'asset': 'SUSHI', 'free': '0', 'locked': '0'}, {'asset': 'SXP', 'free': '0.02428066', 'locked': '0'}, {'asset': 'SYS', 'free': '0', 'locked': '0'}, {'asset': 'TLM', 'free': '0', 'locked': '0'}, {'asset': 'TOMO', 'free': '0', 'locked': '0'}, {'asset': 'TRX', 'free': '22.90672753', 'locked': '0'}, {'asset': 'UNFI', 'free': '0', 'locked': '0'}, {'asset': 'USDT', 'free': '51.68460825', 'locked': '0'}, {'asset': 'VET', 'free': '0', 'locked': '0'}, {'asset': 'VGX', 'free': '0', 'locked': '0'}, {'asset': 'VTHO', 'free': '0.80370608', 'locked': '0'}, {'asset': 'WAVES', 'free': '0.00598331', 'locked': '0'}, {'asset': 'WIN', 'free': '1093.98974995', 'locked': '0'}, {'asset': 'XEM', 'free': '8', 'locked': '0'}, {'asset': 'XLM', 'free': '0.08315474', 'locked': '0'}, {'asset': 'XRP', 'free': '0.285', 'locked': '0'}, {'asset': 'XVG', 'free': '0.2', 'locked': '0'}, {'asset': 'ZIL', 'free': '0', 'locked': '0'}, {'asset': 'ZRX', 'free': '0', 'locked': '0'}]}}, {'type': 'spot', 'updateTime': 1675123199000, 'data': {'totalAssetOfBtc': '0.0031232', 'balances': [{'asset': 'ADA', 'free': '0.067', 'locked': '0'}, {'asset': 'AION', 'free': '5.994', 'locked': '0'}, {'asset': 'ALCX', 'free': '0', 'locked': '0'}, {'asset': 'ALICE', 'free': '0', 'locked': '0'}, {'asset': 'API3', 'free': '0', 'locked': '0'}, {'asset': 'ARN', 'free': '0', 'locked': '0'}, {'asset': 'ATM', 'free': '0', 'locked': '0'}, {'asset': 'AUD', 'free': '0.6811', 'locked': '0'}, {'asset': 'AXS', 'free': '0', 'locked': '0'}, {'asset': 'BNB', 'free': '0.0280778', 'locked': '0'}, {'asset': 'BTC', 'free': '0.00001737', 'locked': '0'}, {'asset': 'BTS', 'free': '0', 'locked': '0'}, {'asset': 'BTT', 'free': '0', 'locked': '0'}, {'asset': 'BTTC', 'free': '1355102.7', 'locked': '0'}, {'asset': 'BUSD', 'free': '1.02272267', 'locked': '0'}, {'asset': 'CDT', 'free': '0', 'locked': '0'}, {'asset': 'CELR', 'free': '0', 'locked': '0'}, {'asset': 'CHZ', 'free': '0', 'locked': '0'}, {'asset': 'CND', 'free': '0.615', 'locked': '0'}, {'asset': 'COMP', 'free': '0', 'locked': '0'}, {'asset': 'CRV', 'free': '0.004', 'locked': '0'}, {'asset': 'DASH', 'free': '0', 'locked': '0'}, {'asset': 'DATA', 'free': '0', 'locked': '0'}, {'asset': 'DENT', 'free': '0', 'locked': '0'}, {'asset': 'DF', 'free': '0', 'locked': '0'}, {'asset': 'DLT', 'free': '44.955', 'locked': '0'}, {'asset': 'DON', 'free': '0.0305648', 'locked': '0'}, {'asset': 'DREP', 'free': '0', 'locked': '0'}, {'asset': 'EDG', 'free': '20.32859611', 'locked': '0'}, {'asset': 'ETH', 'free': '0.00000876', 'locked': '0'}, {'asset': 'ETHW', 'free': '0.00000876', 'locked': '0'}, {'asset': 'FET', 'free': '0', 'locked': '0'}, {'asset': 'FIDA', 'free': '0', 'locked': '0'}, {'asset': 'GAS', 'free': '0.0991151', 'locked': '0'}, {'asset': 'GBP', 'free': '0.0356', 'locked': '0'}, {'asset': 'GMT', 'free': '0', 'locked': '0'}, {'asset': 'GTO', 'free': '86.831', 'locked': '0'}, {'asset': 'HFT', 'free': '0', 'locked': '0'}, {'asset': 'ICX', 'free': '0.0046', 'locked': '0'}, {'asset': 'IOST', 'free': '250', 'locked': '0'}, {'asset': 'IOTA', 'free': '0.852', 'locked': '0'}, {'asset': 'JST', 'free': '12.60668216', 'locked': '0'}, {'asset': 'KMD', 'free': '0', 'locked': '0'}, {'asset': 'KSM', 'free': '0', 'locked': '0'}, {'asset': 'LINK', 'free': '0', 'locked': '0'}, {'asset': 'LTC', 'free': '0.00000341', 'locked': '0'}, {'asset': 'LUNA', 'free': '0', 'locked': '0'}, {'asset': 'MAGIC', 'free': '0', 'locked': '0'}, {'asset': 'MANA', 'free': '0.037', 'locked': '0'}, {'asset': 'MOVR', 'free': '0.001', 'locked': '0'}, {'asset': 'MTL', 'free': '0', 'locked': '0'}, {'asset': 'MULTI', 'free': '0', 'locked': '0'}, {'asset': 'NEBL', 'free': '0.00348', 'locked': '0'}, {'asset': 'NEO', 'free': '0.000556', 'locked': '0'}, {'asset': 'NKN', 'free': '0', 'locked': '0'}, {'asset': 'OCEAN', 'free': '0', 'locked': '0'}, {'asset': 'OMG', 'free': '0.0076', 'locked': '0'}, {'asset': 'ONE', 'free': '0', 'locked': '0'}, {'asset': 'ONG', 'free': '0.15674913', 'locked': '0'}, {'asset': 'ONT', 'free': '0.6747112', 'locked': '0'}, {'asset': 'PSG', 'free': '0', 'locked': '0'}, {'asset': 'QTUM', 'free': '0.00584', 'locked': '0'}, {'asset': 'REN', 'free': '0', 'locked': '0'}, {'asset': 'RVN', 'free': '29.8', 'locked': '0'}, {'asset': 'SAND', 'free': '0', 'locked': '0'}, {'asset': 'SNT', 'free': '0.869', 'locked': '0'}, {'asset': 'SNX', 'free': '0', 'locked': '0'}, {'asset': 'SSV', 'free': '0.00728', 'locked': '0'}, {'asset': 'STRAX', 'free': '0.0014', 'locked': '0'}, {'asset': 'SUSHI', 'free': '0', 'locked': '0'}, {'asset': 'SXP', 'free': '0.02428066', 'locked': '0'}, {'asset': 'SYS', 'free': '0', 'locked': '0'}, {'asset': 'TLM', 'free': '0', 'locked': '0'}, {'asset': 'TOMO', 'free': '0', 'locked': '0'}, {'asset': 'TRX', 'free': '22.90672753', 'locked': '0'}, {'asset': 'UNFI', 'free': '0', 'locked': '0'}, {'asset': 'USDT', 'free': '51.68460825', 'locked': '0'}, {'asset': 'VET', 'free': '0', 'locked': '0'}, {'asset': 'VGX', 'free': '0', 'locked': '0'}, {'asset': 'VTHO', 'free': '0.80370608', 'locked': '0'}, {'asset': 'WAVES', 'free': '0.00598331', 'locked': '0'}, {'asset': 'WIN', 'free': '1093.98974995', 'locked': '0'}, {'asset': 'XEM', 'free': '8', 'locked': '0'}, {'asset': 'XLM', 'free': '0.08315474', 'locked': '0'}, {'asset': 'XRP', 'free': '0.285', 'locked': '0'}, {'asset': 'XVG', 'free': '0.2', 'locked': '0'}, {'asset': 'ZIL', 'free': '0', 'locked': '0'}, {'asset': 'ZRX', 'free': '0', 'locked': '0'}]}}, {'type': 'spot', 'updateTime': 1675209599000, 'data': {'totalAssetOfBtc': '0.0030881', 'balances': [{'asset': 'ADA', 'free': '0.067', 'locked': '0'}, {'asset': 'AION', 'free': '5.994', 'locked': '0'}, {'asset': 'ALCX', 'free': '0', 'locked': '0'}, {'asset': 'ALICE', 'free': '0', 'locked': '0'}, {'asset': 'API3', 'free': '0', 'locked': '0'}, {'asset': 'ARN', 'free': '0', 'locked': '0'}, {'asset': 'ATM', 'free': '0', 'locked': '0'}, {'asset': 'AUD', 'free': '0.6811', 'locked': '0'}, {'asset': 'AXS', 'free': '0', 'locked': '0'}, {'asset': 'BNB', 'free': '0.0280778', 'locked': '0'}, {'asset': 'BTC', 'free': '0.00001737', 'locked': '0'}, {'asset': 'BTS', 'free': '0', 'locked': '0'}, {'asset': 'BTT', 'free': '0', 'locked': '0'}, {'asset': 'BTTC', 'free': '1355102.7', 'locked': '0'}, {'asset': 'BUSD', 'free': '1.02272267', 'locked': '0'}, {'asset': 'CDT', 'free': '0', 'locked': '0'}, {'asset': 'CELR', 'free': '0', 'locked': '0'}, {'asset': 'CHZ', 'free': '0', 'locked': '0'}, {'asset': 'CND', 'free': '0.615', 'locked': '0'}, {'asset': 'COMP', 'free': '0', 'locked': '0'}, {'asset': 'CRV', 'free': '0.004', 'locked': '0'}, {'asset': 'DASH', 'free': '0', 'locked': '0'}, {'asset': 'DATA', 'free': '0', 'locked': '0'}, {'asset': 'DENT', 'free': '0', 'locked': '0'}, {'asset': 'DF', 'free': '0', 'locked': '0'}, {'asset': 'DLT', 'free': '44.955', 'locked': '0'}, {'asset': 'DON', 'free': '0.0305648', 'locked': '0'}, {'asset': 'DREP', 'free': '0', 'locked': '0'}, {'asset': 'EDG', 'free': '20.32859611', 'locked': '0'}, {'asset': 'ETH', 'free': '0.00000876', 'locked': '0'}, {'asset': 'ETHW', 'free': '0.00000876', 'locked': '0'}, {'asset': 'FET', 'free': '0', 'locked': '0'}, {'asset': 'FIDA', 'free': '0', 'locked': '0'}, {'asset': 'GAS', 'free': '0.0991151', 'locked': '0'}, {'asset': 'GBP', 'free': '0.0356', 'locked': '0'}, {'asset': 'GMT', 'free': '0', 'locked': '0'}, {'asset': 'GTO', 'free': '86.831', 'locked': '0'}, {'asset': 'HFT', 'free': '0', 'locked': '0'}, {'asset': 'ICX', 'free': '0.0046', 'locked': '0'}, {'asset': 'IOST', 'free': '250', 'locked': '0'}, {'asset': 'IOTA', 'free': '0.852', 'locked': '0'}, {'asset': 'JST', 'free': '12.60668216', 'locked': '0'}, {'asset': 'KMD', 'free': '0', 'locked': '0'}, {'asset': 'KSM', 'free': '0', 'locked': '0'}, {'asset': 'LINK', 'free': '0', 'locked': '0'}, {'asset': 'LTC', 'free': '0.00000341', 'locked': '0'}, {'asset': 'LUNA', 'free': '0', 'locked': '0'}, {'asset': 'MAGIC', 'free': '0', 'locked': '0'}, {'asset': 'MANA', 'free': '0.037', 'locked': '0'}, {'asset': 'MOVR', 'free': '0.001', 'locked': '0'}, {'asset': 'MTL', 'free': '0', 'locked': '0'}, {'asset': 'MULTI', 'free': '0', 'locked': '0'}, {'asset': 'NEBL', 'free': '0.00348', 'locked': '0'}, {'asset': 'NEO', 'free': '0.000556', 'locked': '0'}, {'asset': 'NKN', 'free': '0', 'locked': '0'}, {'asset': 'OCEAN', 'free': '0', 'locked': '0'}, {'asset': 'OMG', 'free': '0.0076', 'locked': '0'}, {'asset': 'ONE', 'free': '0', 'locked': '0'}, {'asset': 'ONG', 'free': '0.15674913', 'locked': '0'}, {'asset': 'ONT', 'free': '0.6747112', 'locked': '0'}, {'asset': 'PSG', 'free': '0', 'locked': '0'}, {'asset': 'QTUM', 'free': '0.00584', 'locked': '0'}, {'asset': 'REN', 'free': '0', 'locked': '0'}, {'asset': 'RVN', 'free': '29.8', 'locked': '0'}, {'asset': 'SAND', 'free': '0', 'locked': '0'}, {'asset': 'SNT', 'free': '0.869', 'locked': '0'}, {'asset': 'SNX', 'free': '0', 'locked': '0'}, {'asset': 'SSV', 'free': '0.00728', 'locked': '0'}, {'asset': 'STRAX', 'free': '0.0014', 'locked': '0'}, {'asset': 'SUSHI', 'free': '0', 'locked': '0'}, {'asset': 'SXP', 'free': '0.02428066', 'locked': '0'}, {'asset': 'SYS', 'free': '0', 'locked': '0'}, {'asset': 'TLM', 'free': '0', 'locked': '0'}, {'asset': 'TOMO', 'free': '0', 'locked': '0'}, {'asset': 'TRX', 'free': '22.90672753', 'locked': '0'}, {'asset': 'UNFI', 'free': '0', 'locked': '0'}, {'asset': 'USDT', 'free': '51.68460825', 'locked': '0'}, {'asset': 'VET', 'free': '0', 'locked': '0'}, {'asset': 'VGX', 'free': '0', 'locked': '0'}, {'asset': 'VTHO', 'free': '0.80370608', 'locked': '0'}, {'asset': 'WAVES', 'free': '0.00598331', 'locked': '0'}, {'asset': 'WIN', 'free': '1093.98974995', 'locked': '0'}, {'asset': 'XEM', 'free': '8', 'locked': '0'}, {'asset': 'XLM', 'free': '0.08315474', 'locked': '0'}, {'asset': 'XRP', 'free': '0.285', 'locked': '0'}, {'asset': 'XVG', 'free': '0.2', 'locked': '0'}, {'asset': 'ZIL', 'free': '0', 'locked': '0'}, {'asset': 'ZRX', 'free': '0', 'locked': '0'}]}}, {'type': 'spot', 'updateTime': 1675295999000, 'data': {'totalAssetOfBtc': '0.00302828', 'balances': [{'asset': 'ADA', 'free': '0.067', 'locked': '0'}, {'asset': 'AION', 'free': '5.994', 'locked': '0'}, {'asset': 'ALCX', 'free': '0', 'locked': '0'}, {'asset': 'ALICE', 'free': '0', 'locked': '0'}, {'asset': 'API3', 'free': '0', 'locked': '0'}, {'asset': 'ARN', 'free': '0', 'locked': '0'}, {'asset': 'ATM', 'free': '0', 'locked': '0'}, {'asset': 'AUD', 'free': '0.6811', 'locked': '0'}, {'asset': 'AXS', 'free': '0', 'locked': '0'}, {'asset': 'BNB', 'free': '0.0280778', 'locked': '0'}, {'asset': 'BTC', 'free': '0.00001737', 'locked': '0'}, {'asset': 'BTS', 'free': '0', 'locked': '0'}, {'asset': 'BTT', 'free': '0', 'locked': '0'}, {'asset': 'BTTC', 'free': '1355102.7', 'locked': '0'}, {'asset': 'BUSD', 'free': '1.02272267', 'locked': '0'}, {'asset': 'CDT', 'free': '0', 'locked': '0'}, {'asset': 'CELR', 'free': '0', 'locked': '0'}, {'asset': 'CHZ', 'free': '0', 'locked': '0'}, {'asset': 'CND', 'free': '0.615', 'locked': '0'}, {'asset': 'COMP', 'free': '0', 'locked': '0'}, {'asset': 'CRV', 'free': '0.004', 'locked': '0'}, {'asset': 'DASH', 'free': '0', 'locked': '0'}, {'asset': 'DATA', 'free': '0', 'locked': '0'}, {'asset': 'DENT', 'free': '0', 'locked': '0'}, {'asset': 'DF', 'free': '0', 'locked': '0'}, {'asset': 'DLT', 'free': '44.955', 'locked': '0'}, {'asset': 'DON', 'free': '0.0305648', 'locked': '0'}, {'asset': 'DREP', 'free': '0', 'locked': '0'}, {'asset': 'EDG', 'free': '20.32859611', 'locked': '0'}, {'asset': 'ETH', 'free': '0.00000876', 'locked': '0'}, {'asset': 'ETHW', 'free': '0.00000876', 'locked': '0'}, {'asset': 'FET', 'free': '0', 'locked': '0'}, {'asset': 'FIDA', 'free': '0', 'locked': '0'}, {'asset': 'GAS', 'free': '0.0991151', 'locked': '0'}, {'asset': 'GBP', 'free': '0.0356', 'locked': '0'}, {'asset': 'GMT', 'free': '0', 'locked': '0'}, {'asset': 'GTO', 'free': '86.831', 'locked': '0'}, {'asset': 'HFT', 'free': '0', 'locked': '0'}, {'asset': 'ICX', 'free': '0.0046', 'locked': '0'}, {'asset': 'IOST', 'free': '250', 'locked': '0'}, {'asset': 'IOTA', 'free': '0.852', 'locked': '0'}, {'asset': 'JST', 'free': '12.60668216', 'locked': '0'}, {'asset': 'KMD', 'free': '0', 'locked': '0'}, {'asset': 'KSM', 'free': '0', 'locked': '0'}, {'asset': 'LINK', 'free': '0', 'locked': '0'}, {'asset': 'LTC', 'free': '0.00000341', 'locked': '0'}, {'asset': 'LUNA', 'free': '0', 'locked': '0'}, {'asset': 'MAGIC', 'free': '0', 'locked': '0'}, {'asset': 'MANA', 'free': '0.037', 'locked': '0'}, {'asset': 'MOVR', 'free': '0.001', 'locked': '0'}, {'asset': 'MTL', 'free': '0', 'locked': '0'}, {'asset': 'MULTI', 'free': '0', 'locked': '0'}, {'asset': 'NEBL', 'free': '0.00348', 'locked': '0'}, {'asset': 'NEO', 'free': '0.000556', 'locked': '0'}, {'asset': 'NKN', 'free': '0', 'locked': '0'}, {'asset': 'OCEAN', 'free': '0', 'locked': '0'}, {'asset': 'OMG', 'free': '0.0076', 'locked': '0'}, {'asset': 'ONE', 'free': '0', 'locked': '0'}, {'asset': 'ONG', 'free': '0.15674913', 'locked': '0'}, {'asset': 'ONT', 'free': '0.6747112', 'locked': '0'}, {'asset': 'PSG', 'free': '0', 'locked': '0'}, {'asset': 'QTUM', 'free': '0.00584', 'locked': '0'}, {'asset': 'REN', 'free': '0', 'locked': '0'}, {'asset': 'RVN', 'free': '29.8', 'locked': '0'}, {'asset': 'SAND', 'free': '0', 'locked': '0'}, {'asset': 'SNT', 'free': '0.869', 'locked': '0'}, {'asset': 'SNX', 'free': '0', 'locked': '0'}, {'asset': 'SSV', 'free': '0.00728', 'locked': '0'}, {'asset': 'STRAX', 'free': '0.0014', 'locked': '0'}, {'asset': 'SUSHI', 'free': '0', 'locked': '0'}, {'asset': 'SXP', 'free': '0.02428066', 'locked': '0'}, {'asset': 'SYS', 'free': '0', 'locked': '0'}, {'asset': 'TLM', 'free': '0', 'locked': '0'}, {'asset': 'TOMO', 'free': '0', 'locked': '0'}, {'asset': 'TRX', 'free': '22.90672753', 'locked': '0'}, {'asset': 'UNFI', 'free': '0', 'locked': '0'}, {'asset': 'USDT', 'free': '51.68460825', 'locked': '0'}, {'asset': 'VET', 'free': '0', 'locked': '0'}, {'asset': 'VGX', 'free': '0', 'locked': '0'}, {'asset': 'VTHO', 'free': '0.80370608', 'locked': '0'}, {'asset': 'WAVES', 'free': '0.00598331', 'locked': '0'}, {'asset': 'WIN', 'free': '1093.98974995', 'locked': '0'}, {'asset': 'XEM', 'free': '8', 'locked': '0'}, {'asset': 'XLM', 'free': '0.08315474', 'locked': '0'}, {'asset': 'XRP', 'free': '0.285', 'locked': '0'}, {'asset': 'XVG', 'free': '0.2', 'locked': '0'}, {'asset': 'ZIL', 'free': '0', 'locked': '0'}, {'asset': 'ZRX', 'free': '0', 'locked': '0'}]}}, {'type': 'spot', 'updateTime': 1675382399000, 'data': {'totalAssetOfBtc': '0.00306609', 'balances': [{'asset': 'ADA', 'free': '0.067', 'locked': '0'}, {'asset': 'AION', 'free': '5.994', 'locked': '0'}, {'asset': 'ALCX', 'free': '0', 'locked': '0'}, {'asset': 'ALICE', 'free': '0', 'locked': '0'}, {'asset': 'API3', 'free': '0', 'locked': '0'}, {'asset': 'ARN', 'free': '0', 'locked': '0'}, {'asset': 'ATM', 'free': '0', 'locked': '0'}, {'asset': 'AUD', 'free': '0.6811', 'locked': '0'}, {'asset': 'AXS', 'free': '0', 'locked': '0'}, {'asset': 'BNB', 'free': '0.0280778', 'locked': '0'}, {'asset': 'BTC', 'free': '0.00001737', 'locked': '0'}, {'asset': 'BTS', 'free': '0', 'locked': '0'}, {'asset': 'BTT', 'free': '0', 'locked': '0'}, {'asset': 'BTTC', 'free': '1355102.7', 'locked': '0'}, {'asset': 'BUSD', 'free': '1.02272267', 'locked': '0'}, {'asset': 'CDT', 'free': '0', 'locked': '0'}, {'asset': 'CELR', 'free': '0', 'locked': '0'}, {'asset': 'CHZ', 'free': '0', 'locked': '0'}, {'asset': 'CND', 'free': '0.615', 'locked': '0'}, {'asset': 'COMP', 'free': '0', 'locked': '0'}, {'asset': 'CRV', 'free': '0.004', 'locked': '0'}, {'asset': 'DASH', 'free': '0', 'locked': '0'}, {'asset': 'DATA', 'free': '0', 'locked': '0'}, {'asset': 'DENT', 'free': '0', 'locked': '0'}, {'asset': 'DF', 'free': '0', 'locked': '0'}, {'asset': 'DLT', 'free': '44.955', 'locked': '0'}, {'asset': 'DON', 'free': '0.0305648', 'locked': '0'}, {'asset': 'DREP', 'free': '0', 'locked': '0'}, {'asset': 'EDG', 'free': '20.32859611', 'locked': '0'}, {'asset': 'ETH', 'free': '0.00000876', 'locked': '0'}, {'asset': 'ETHW', 'free': '0.00000876', 'locked': '0'}, {'asset': 'FET', 'free': '0', 'locked': '0'}, {'asset': 'FIDA', 'free': '0', 'locked': '0'}, {'asset': 'GAS', 'free': '0.0991151', 'locked': '0'}, {'asset': 'GBP', 'free': '0.0356', 'locked': '0'}, {'asset': 'GMT', 'free': '0', 'locked': '0'}, {'asset': 'GTO', 'free': '86.831', 'locked': '0'}, {'asset': 'HFT', 'free': '0', 'locked': '0'}, {'asset': 'ICX', 'free': '0.0046', 'locked': '0'}, {'asset': 'IOST', 'free': '250', 'locked': '0'}, {'asset': 'IOTA', 'free': '0.852', 'locked': '0'}, {'asset': 'JST', 'free': '12.60668216', 'locked': '0'}, {'asset': 'KMD', 'free': '0', 'locked': '0'}, {'asset': 'KSM', 'free': '0', 'locked': '0'}, {'asset': 'LINK', 'free': '0', 'locked': '0'}, {'asset': 'LTC', 'free': '0.00000341', 'locked': '0'}, {'asset': 'LUNA', 'free': '0', 'locked': '0'}, {'asset': 'MAGIC', 'free': '0', 'locked': '0'}, {'asset': 'MANA', 'free': '0.037', 'locked': '0'}, {'asset': 'MOVR', 'free': '0.001', 'locked': '0'}, {'asset': 'MTL', 'free': '0', 'locked': '0'}, {'asset': 'MULTI', 'free': '0', 'locked': '0'}, {'asset': 'NEBL', 'free': '0.00348', 'locked': '0'}, {'asset': 'NEO', 'free': '0.000556', 'locked': '0'}, {'asset': 'NKN', 'free': '0', 'locked': '0'}, {'asset': 'OCEAN', 'free': '0', 'locked': '0'}, {'asset': 'OMG', 'free': '0.0076', 'locked': '0'}, {'asset': 'ONE', 'free': '0', 'locked': '0'}, {'asset': 'ONG', 'free': '0.15674913', 'locked': '0'}, {'asset': 'ONT', 'free': '0.6747112', 'locked': '0'}, {'asset': 'PSG', 'free': '0', 'locked': '0'}, {'asset': 'QTUM', 'free': '0.00584', 'locked': '0'}, {'asset': 'REN', 'free': '0', 'locked': '0'}, {'asset': 'RVN', 'free': '29.8', 'locked': '0'}, {'asset': 'SAND', 'free': '0', 'locked': '0'}, {'asset': 'SNT', 'free': '0.869', 'locked': '0'}, {'asset': 'SNX', 'free': '0', 'locked': '0'}, {'asset': 'SSV', 'free': '0.00728', 'locked': '0'}, {'asset': 'STRAX', 'free': '0.0014', 'locked': '0'}, {'asset': 'SUSHI', 'free': '0', 'locked': '0'}, {'asset': 'SXP', 'free': '0.02428066', 'locked': '0'}, {'asset': 'SYS', 'free': '0', 'locked': '0'}, {'asset': 'TLM', 'free': '0', 'locked': '0'}, {'asset': 'TOMO', 'free': '0', 'locked': '0'}, {'asset': 'TRX', 'free': '22.90672753', 'locked': '0'}, {'asset': 'UNFI', 'free': '0', 'locked': '0'}, {'asset': 'USDT', 'free': '51.68460825', 'locked': '0'}, {'asset': 'VET', 'free': '0', 'locked': '0'}, {'asset': 'VGX', 'free': '0', 'locked': '0'}, {'asset': 'VTHO', 'free': '0.80370608', 'locked': '0'}, {'asset': 'WAVES', 'free': '0.00598331', 'locked': '0'}, {'asset': 'WIN', 'free': '1093.98974995', 'locked': '0'}, {'asset': 'XEM', 'free': '8', 'locked': '0'}, {'asset': 'XLM', 'free': '0.08315474', 'locked': '0'}, {'asset': 'XRP', 'free': '0.285', 'locked': '0'}, {'asset': 'XVG', 'free': '0.2', 'locked': '0'}, {'asset': 'ZIL', 'free': '0', 'locked': '0'}, {'asset': 'ZRX', 'free': '0', 'locked': '0'}]}}]}
-# def get_balances_spot():
-#     # balances = acc_snap_shot_dict ['snapshotVos'][0]['data']['balances']
-#     bal_list = [{'asset': 'ADA', 'free': '0.067', 'locked': '0'}, {'asset': 'AION', 'free': '5.994', 'locked': '0'},
-#                 {'asset': 'ALCX', 'free': '0', 'locked': '0'}, {'asset': 'ALICE', 'free': '0', 'locked': '0'},
-#                 {'asset': 'API3', 'free': '0', 'locked': '0'}, {'asset': 'ARN', 'free': '0', 'locked': '0'},
-#                 {'asset': 'ATM', 'free': '0', 'locked': '0'}, {'asset': 'AUD', 'free': '0.6811', 'locked': '0'},
-#                 {'asset': 'AXS', 'free': '0', 'locked': '0'}, {'asset': 'BNB', 'free': '0.0280778', 'locked': '0'},
-#                 {'asset': 'BTC', 'free': '0.00001737', 'locked': '0'}, {'asset': 'BTS', 'free': '0', 'locked': '0'},
-#                 {'asset': 'BTT', 'free': '0', 'locked': '0'}, {'asset': 'BTTC', 'free': '1355102.7', 'locked': '0'},
-#                 {'asset': 'BUSD', 'free': '1.02272267', 'locked': '0'}, {'asset': 'CDT', 'free': '0', 'locked': '0'},
-#                 {'asset': 'CELR', 'free': '0', 'locked': '0'}, {'asset': 'CHZ', 'free': '0', 'locked': '0'},
-#                 {'asset': 'CND', 'free': '0.615', 'locked': '0'}, {'asset': 'COMP', 'free': '0', 'locked': '0'},
-#                 {'asset': 'CRV', 'free': '0.004', 'locked': '0'}, {'asset': 'DASH', 'free': '0', 'locked': '0'},
-#                 {'asset': 'DATA', 'free': '0', 'locked': '0'}, {'asset': 'DENT', 'free': '0', 'locked': '0'},
-#                 {'asset': 'DF', 'free': '0', 'locked': '0'}, {'asset': 'DLT', 'free': '44.955', 'locked': '0'},
-#                 {'asset': 'DON', 'free': '0.0305648', 'locked': '0'}, {'asset': 'DREP', 'free': '0', 'locked': '0'},
-#                 {'asset': 'EDG', 'free': '20.32859611', 'locked': '0'},
-#                 {'asset': 'ETH', 'free': '0.00000876', 'locked': '0'},
-#                 {'asset': 'ETHW', 'free': '0.00000876', 'locked': '0'}, {'asset': 'FET', 'free': '0', 'locked': '0'},
-#                 {'asset': 'FIDA', 'free': '0', 'locked': '0'}, {'asset': 'GAS', 'free': '0.0991151', 'locked': '0'},
-#                 {'asset': 'GBP', 'free': '0.0356', 'locked': '0'}, {'asset': 'GMT', 'free': '0', 'locked': '0'},
-#                 {'asset': 'GTO', 'free': '86.831', 'locked': '0'}, {'asset': 'HFT', 'free': '0', 'locked': '0'},
-#                 {'asset': 'ICX', 'free': '0.0046', 'locked': '0'}, {'asset': 'IOST', 'free': '250', 'locked': '0'},
-#                 {'asset': 'IOTA', 'free': '0.852', 'locked': '0'},
-#                 {'asset': 'JST', 'free': '12.60668216', 'locked': '0'}, {'asset': 'KMD', 'free': '0', 'locked': '0'},
-#                 {'asset': 'KSM', 'free': '0', 'locked': '0'}, {'asset': 'LINK', 'free': '0', 'locked': '0'},
-#                 {'asset': 'LTC', 'free': '0.00000341', 'locked': '0'}, {'asset': 'LUNA', 'free': '0', 'locked': '0'},
-#                 {'asset': 'MAGIC', 'free': '0', 'locked': '0'}, {'asset': 'MANA', 'free': '0.037', 'locked': '0'},
-#                 {'asset': 'MOVR', 'free': '0.001', 'locked': '0'}, {'asset': 'MTL', 'free': '0', 'locked': '0'},
-#                 {'asset': 'MULTI', 'free': '0', 'locked': '0'}, {'asset': 'NEBL', 'free': '0.00348', 'locked': '0'},
-#                 {'asset': 'NEO', 'free': '0.000556', 'locked': '0'}, {'asset': 'NKN', 'free': '0', 'locked': '0'},
-#                 {'asset': 'OCEAN', 'free': '0', 'locked': '0'}, {'asset': 'OMG', 'free': '0.0076', 'locked': '0'},
-#                 {'asset': 'ONE', 'free': '0', 'locked': '0'}, {'asset': 'ONG', 'free': '0.15674913', 'locked': '0'},
-#                 {'asset': 'ONT', 'free': '0.6747112', 'locked': '0'}, {'asset': 'PSG', 'free': '0', 'locked': '0'},
-#                 {'asset': 'QTUM', 'free': '0.00584', 'locked': '0'}, {'asset': 'REN', 'free': '0', 'locked': '0'},
-#                 {'asset': 'RVN', 'free': '29.8', 'locked': '0'}, {'asset': 'SAND', 'free': '0', 'locked': '0'},
-#                 {'asset': 'SNT', 'free': '0.869', 'locked': '0'}, {'asset': 'SNX', 'free': '0', 'locked': '0'},
-#                 {'asset': 'SSV', 'free': '0.00728', 'locked': '0'}, {'asset': 'STRAX', 'free': '0.0014', 'locked': '0'},
-#                 {'asset': 'SUSHI', 'free': '0', 'locked': '0'}, {'asset': 'SXP', 'free': '0.02428066', 'locked': '0'},
-#                 {'asset': 'SYS', 'free': '0', 'locked': '0'}, {'asset': 'TLM', 'free': '0', 'locked': '0'},
-#                 {'asset': 'TOMO', 'free': '0', 'locked': '0'}, {'asset': 'TRX', 'free': '22.90672753', 'locked': '0'},
-#                 {'asset': 'UNFI', 'free': '0', 'locked': '0'}, {'asset': 'USDT', 'free': '51.68460825', 'locked': '0'},
-#                 {'asset': 'VET', 'free': '0', 'locked': '0'}, {'asset': 'VGX', 'free': '0', 'locked': '0'},
-#                 {'asset': 'VTHO', 'free': '0.80370608', 'locked': '0'},
-#                 {'asset': 'WAVES', 'free': '0.00598331', 'locked': '0'},
-#                 {'asset': 'WIN', 'free': '1093.98974995', 'locked': '0'}, {'asset': 'XEM', 'free': '8', 'locked': '0'},
-#                 {'asset': 'XLM', 'free': '0.08315474', 'locked': '0'}, {'asset': 'XRP', 'free': '0.285', 'locked': '0'},
-#                 {'asset': 'XVG', 'free': '0.2', 'locked': '0'}, {'asset': 'ZIL', 'free': '0', 'locked': '0'},
-#                 {'asset': 'ZRX', 'free': '0', 'locked': '0'}]
+
+def run_websocket_binance(lst):
+    my_client.book_ticker(
+        symbol=lst,
+        id=1,
+        callback=message_handler,
+    )
+
+
+#########___bybit websocket___#################
+
+def handle_orderbook(message):
+    data = message["data"]
+    symbol = 'bybit_' + data['s']
+    bid = data['b'][0][0]
+    ask = data['a'][0][0]
+    bidask = f'{bid},{ask}'
+    print(symbol, bidask)
+    set_redis(name=symbol, value=bidask)
+
+
 #
-#     bal_list = list(filter(lambda x: float(x['free']) > 0, bal_list))
-#
-#     return bal_list
-
-# def get_totalAssetOfBtc():
-#     totalAssetOfBtc = acc_snap_shot_dict('SPOT')['snapshotVos'][0]['data']['totalAssetOfBtc']
-#     return totalAssetOfBtc
+def ws_bybit(symbols):
+    for i in symbols:
+        ws_spot = spot.WebSocket(test=False)
+        ws_spot.depth_v2_stream(handle_orderbook, i)
 
 
+#########___Gate.Io websocket___#################
 
+def print_message(conn: Connection, response: WebSocketResponse):
+    # print(response.result)
+    if response.error:
+        print('error returned: ', response.error)
+        conn.close()
+        return
 
-
-
-
-
-
-# def get_exchages():
-#     print(Exchanges.objects.filter(is_visible=True))
-
-
-
-
-
-# binance_api_balance = {'USDT': 10000, 'BTC': 0.5, 'XRP': 30000 }
-# bybit_api_balance = {'USDT': 10000, 'BTC': 0.5, 'ETH': 10 }
-# poloniex_api_balance = {'USDT': 10000, 'BTC': 0.5, 'ADA': 40000 }
-#
-#
-#
-#
-#
-# class Exchenges:
-#
-#     def __init__(self, name, spot_free, wsocket='', api=''):
-#         self.name = name
-#         self.spot_free = spot_free
-#         self.wsocket = wsocket
-#         self.api = api
-#         self.api_key = ''
-#         self.api_secret_key = ''
-#         self.balance = {}
-#
-#     def upload_blance(self):
-#         self.balance = {}#api connect
-#
-#     def get_symbol_balance(self, symbol):
-#         pass
-#         #returne {baseAsset: vol quoteAsset: vol}
-#
-#
-# class Bunch:
-#
-#     def __init__(self, exchenge_1, exchenge_2, symbol):
-#         self.exchenge_1 = exchenge_1
-#         self.exchenge_2 = exchenge_2
-#         self.symbol = symbol
-#         self.exchenge_1_balance = 0
-#         self.exchenge_2_balance = 0
-#
-#     def set_balans(self):
-#         self.exchenge_1_balance = self.exchenge_1.get_balance(self.symbol)
-#         self.exchenge_2_balance = self.exchenge_1.get_balance(self.symbol)
-#
-#     def __str__(self):
-#         return
-#
-#
-# # class Arbitr_screener:
-# #     PROFIT_PERCENT = 0.5
-# #
-# #     def __init__(self, bunch):
-# #         self.bunch = bunch
-#
-# PROFIT_PERCENT = 0.5
-# Binance = Exchenges('Binance', 0.075)
-# Bybit = Exchenges('Bybit', 0.1)
-# Poloniex = Exchenges('Poloniex', 0.15)
-#
-# buch1 = Bunch(Bybit, Binance, 'BTSUSDT')
-# buch1.set_balans()
-#
-#
-#
-# def check_buy_sell(bunch):
-#
-#     investment_amount1 = initial_investment
-#     current_price1 = fetch_current_ticker_price(scrip1)['ask']
-#     final_price = 0
-#     scrip_prices = {}
-#     if current_price1 is not None: #and not check_if_float_zero(current_price1):
-#         buy_quantity1 = round(investment_amount1 / current_price1, 8)
-#
-#
-#         ## SCRIP2
-#         investment_amount2 = buy_quantity1
-#         current_price2 = fetch_current_ticker_price(scrip2)['bid']
-#         if current_price2 is not None:# and not check_if_float_zero(current_price2):
-#             sell_quantity2 = buy_quantity1
-#             sell_price2 = round(sell_quantity2 * current_price2, 8)
-#
-#
-#             ## SCRIP1
-#             investment_amount3 = sell_price2
-#             current_price3 = fetch_current_ticker_price(scrip3)['bid']
-#             if current_price3 is not None:# and not check_if_float_zero(current_price3):
-#                 sell_quantity3 = sell_price2
-#                 final_price = round(sell_quantity3 * current_price3, 3)
-#                 scrip_prices = {scrip1: current_price1, scrip2: current_price2, scrip3: current_price3}
-#     return final_price, scrip_prices
-#
-from redis_db import *
+    data = response.result
+    if not data.get('status'):
+        symbol = 'gateio_' + ''.join(data.get('s').split('_'))
+        bid = data.get('b')
+        ask = data.get('a')
+        bidask = f'{bid},{ask}'
+        print(symbol, bidask)
+        set_redis(name=symbol, value=bidask)
 
 
 
+@async_to_sync
+async def ws_gateio(symbols):
+    # initialize default connection, which connects to spot WebSocket V4
+    # it is recommended to use one conn to initialize multiple channels
+    conn = Connection(Configuration())
+
+    # subscribe to any channel you are interested into, with the callback function
+    channel = SpotBookTickerChannel(conn, print_message)
+    channel.subscribe(symbols)
+
+    # start the client
+    await conn.run()
 
 
+def websockets(lst, *args):
+    dict_symbols = {}
+    for a, b in lst:
+        if dict_symbols.get(a['exchange'], False):
+            dict_symbols[a['exchange']] = dict_symbols[a['exchange']] | {a['node']['symbol']}
+        else:
+            dict_symbols[a['exchange']] = {a['node']['symbol']}
+        if dict_symbols.get(b['exchange'], False):
+            dict_symbols[b['exchange']] = dict_symbols[b['exchange']] | {b['node']['symbol']}
+        else:
+            dict_symbols[b['exchange']] = {b['node']['symbol']}
 
 
+    gate_symbols = [args[0][x] for x in dict_symbols['Gate.io']]
 
-
-
+    run_websocket_binance(list(dict_symbols['Binance']))
+    threading.Thread(target=ws_bybit, args=(list(dict_symbols['Bybit']),)).start()
+    threading.Thread(target=ws_gateio, args=(gate_symbols, )).start()

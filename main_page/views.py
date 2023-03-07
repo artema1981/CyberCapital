@@ -1,4 +1,5 @@
 import pandas as pd
+from asgiref.sync import sync_to_async
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views import View
@@ -6,14 +7,17 @@ from .clients_exch_data import *
 from .models import Exchanges, AddApiKey
 from django.contrib.auth.models import User
 from django.views.generic import ListView, CreateView, FormView, UpdateView, DeleteView
-from .utils import DataMixin
+from .utils import DataMixin, gateio_symbol_translate
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from .redis_db import *
-
+from .arbi_alg import websockets
 
 # Create your views here.
+def read(filename):
+    with open(filename, 'r', encoding= 'utf-8') as file:
+        return json.load(file)
 
 class MainPage(DataMixin, ListView):
     model = Exchanges
@@ -115,8 +119,6 @@ class Balances(LoginRequiredMixin, DataMixin, ListView):
         n = len(exchange_lst)
         x = 0
         bunches_list = []
-        bunches_dict = {}
-
         def close(coin, exchange):
             for i in range(x, n):
                 for coin2 in all_balances[exchange_lst[i]]:
@@ -143,6 +145,8 @@ class Balances(LoginRequiredMixin, DataMixin, ListView):
             for coin in all_balances[exchange_lst[i]]:
                 close(coin, exchange_lst[i])
 
+
+        websockets(bunches_list, gateio_symbol_translate(all_symbols))
         return bunches_list
     def get_balances(self):
         """
@@ -151,34 +155,48 @@ class Balances(LoginRequiredMixin, DataMixin, ListView):
         connect_data = AddApiKey.objects.filter(user_profile_id=self.request.user.pk)
         if not connect_data:
             return '<h3>You have not any one connected  exchange</h3>'
+        demo = True
         all_symbols = {}  # {'Binance': ['ETHBTC', 'LTCBTC'..., 'Bybit': [['ETHBTC', 'LTCBTC'...,
         exchange_lst = []
         balances_lst = []
         set_coins = set()
-        for i in connect_data:
-            exchange_lst.append(i.exchange.name)
-            Exchange_Api = self.get_exchange(i.exchange.name)
-            client_instance = Exchange_Api(i.user_profile.pk, i.api_key, i.secret_api_key)
-            balance = client_instance.get_balance_spot()
-            balances_lst.append(balance)
-            set_coins = set_coins | set(balance.keys())
-            all_symbols[i.exchange.name] = client_instance.get_all_symbols_list()
+
+        if demo:
+
+            all_symbols = read('demofiles/all_symbols.json')
+            exchange_lst = read('demofiles/exchange_lst.json')
+            balances_lst = read('demofiles/balances_lst.json')
+            lst_coin = [x.keys() for x in balances_lst]
+            set_coins = set()
+            for i in lst_coin:
+                set_coins = set_coins | set(i)
+        else:
+
+            for i in connect_data:
+                exchange_lst.append(i.exchange.name)
+                Exchange_Api = self.get_exchange(i.exchange.name)
+                client_instance = Exchange_Api(i.user_profile.pk, i.api_key, i.secret_api_key)
+                balance = client_instance.get_balance_spot()
+                balances_lst.append(balance)
+                set_coins = set_coins | set(balance.keys())
+                all_symbols[i.exchange.name] = client_instance.get_all_symbols_list()
+
+
+
+
         coins_list = list(set_coins)
-
         bunches_list = Balances.render_bunch(balances_lst, exchange_lst, all_symbols)
-        # for i in bunches_list:
-        #     print(i)
-
-
         df_list = []
         for i in range(len(exchange_lst)):
             bal_dict_s = pd.Series(data=balances_lst[i], index=coins_list)
             df_list.append(pd.DataFrame({'coin': coins_list,
                                          exchange_lst[i]: bal_dict_s.values}))
+
         res = df_list[0]
         if len(df_list) > 1:
             for i in range(1, len(df_list)):
                 res = res.join(df_list[i].set_index('coin'), on='coin')
+
         return {'balance_chart': res, 'bunches_list': bunches_list}
 
     def get_context_data(self, *, object_list=None, **kwargs):

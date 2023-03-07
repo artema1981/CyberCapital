@@ -25,5 +25,11 @@ class DataMixin:
 
 
 
+def gateio_symbol_translate(all_symbols):
+    symbol_dict = {}
+    for i in [x for x in all_symbols['Gate.io']]:
+        newsymbol = i['baseAsset'] + '_' + i['quoteAsset']
+        symbol_dict[i['symbol']] = newsymbol
 
+    return symbol_dict
 

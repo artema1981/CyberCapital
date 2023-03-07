@@ -17,13 +17,14 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls import static
-from account.views import logout_view, RegisterUser, LoginUser, ProfilePage
+from account.views import logout_view, RegisterUser, LoginUser, ProfilePage, BioUpdateView
 
 urlpatterns = [
     path('login/', LoginUser.as_view(), name='login'),
     path('logout/', logout_view, name='logout'),
     path('registration/', RegisterUser.as_view(), name='registration'),
     path('profile/', ProfilePage.as_view(), name='profile'),
+    path('profile/<int:pk>', BioUpdateView.as_view(), name='bio_update'),
     path('admin/', admin.site.urls),
     path('', include('main_page.urls')),
 ]
