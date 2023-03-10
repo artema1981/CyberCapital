@@ -11,17 +11,15 @@ from gate_ws.spot import SpotPublicTradeChannel, SpotBookTickerChannel
 #########____binance websocket____#################
 def message_handler(message):
     if message.get('stream'):
-        symbol = 'binance_' + message['data'].get('s')
+        symbol = 'Binance_' + message['data'].get('s')
         bid = message['data'].get('b')
         ask = message['data'].get('a')
         bidask = f'{bid},{ask}'
-        print(symbol, bidask)
         set_redis(name=symbol, value=bidask)
 
 
 my_client = Client()
 my_client.start()
-
 
 
 def run_websocket_binance(lst):
@@ -36,11 +34,10 @@ def run_websocket_binance(lst):
 
 def handle_orderbook(message):
     data = message["data"]
-    symbol = 'bybit_' + data['s']
+    symbol = 'Bybit_' + data['s']
     bid = data['b'][0][0]
     ask = data['a'][0][0]
     bidask = f'{bid},{ask}'
-    print(symbol, bidask)
     set_redis(name=symbol, value=bidask)
 
 
@@ -62,13 +59,11 @@ def print_message(conn: Connection, response: WebSocketResponse):
 
     data = response.result
     if not data.get('status'):
-        symbol = 'gateio_' + ''.join(data.get('s').split('_'))
+        symbol = 'Gate.io_' + ''.join(data.get('s').split('_'))
         bid = data.get('b')
         ask = data.get('a')
         bidask = f'{bid},{ask}'
-        print(symbol, bidask)
         set_redis(name=symbol, value=bidask)
-
 
 
 @async_to_sync
@@ -97,9 +92,8 @@ def websockets(lst, *args):
         else:
             dict_symbols[b['exchange']] = {b['node']['symbol']}
 
-
     gate_symbols = [args[0][x] for x in dict_symbols['Gate.io']]
 
     run_websocket_binance(list(dict_symbols['Binance']))
     threading.Thread(target=ws_bybit, args=(list(dict_symbols['Bybit']),)).start()
-    threading.Thread(target=ws_gateio, args=(gate_symbols, )).start()
+    threading.Thread(target=ws_gateio, args=(gate_symbols,)).start()

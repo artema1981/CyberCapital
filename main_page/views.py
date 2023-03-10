@@ -1,18 +1,14 @@
 import pandas as pd
-from asgiref.sync import sync_to_async
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import View
 from .clients_exch_data import *
 from .models import Exchanges, AddApiKey
-from django.contrib.auth.models import User
-from django.views.generic import ListView, CreateView, FormView, UpdateView, DeleteView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from .utils import DataMixin, gateio_symbol_translate
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.models import User
-from django.http import HttpResponse
 from .redis_db import *
-from .arbi_alg import websockets
+from .websockets_connector import websockets
 
 # Create your views here.
 def read(filename):
@@ -207,6 +203,7 @@ class Balances(LoginRequiredMixin, DataMixin, ListView):
         else:
             context['balance_chart'] = self.get_balances()['balance_chart'].to_html()
             context['bunches_list'] = self.get_balances()['bunches_list']
+        print(context['bunches_list'])
         return dict(list(context.items()) + list(c_def.items()))
 
     def get_queryset(self):
