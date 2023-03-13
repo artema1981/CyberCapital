@@ -92,6 +92,7 @@ def websockets(lst, *args):
         else:
             dict_symbols[b['exchange']] = {b['node']['symbol']}
 
+
     gate_symbols = [args[0][x] for x in dict_symbols['Gate.io']]
 
     run_websocket_binance(list(dict_symbols['Binance']))
