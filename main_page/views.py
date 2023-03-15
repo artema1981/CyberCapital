@@ -101,10 +101,6 @@ class Connect(DataMixin, View):
         return redirect('exchanges')
 
 
-
-
-
-
 class Balances(LoginRequiredMixin, DataMixin, ListView):
     template_name = 'balances.html'
     context_object_name = 'balances'
@@ -154,8 +150,6 @@ class Balances(LoginRequiredMixin, DataMixin, ListView):
 
                 close(coin, exchange_lst[i])
         websockets(bunches_list, gateio_symbol_translate(all_symbols))
-        # for i in bunches_list:
-        #     print(i)
         return bunches_list
     def get_balances(self):
         """
@@ -175,11 +169,7 @@ class Balances(LoginRequiredMixin, DataMixin, ListView):
 
             all_symbols = read('demofiles/all_symbols.json')
             exchange_lst = read('demofiles/exchange_lst.json')
-            balances_dict = {}
-
-            for i in Profile.objects.filter(user=self.request.user.pk):
-                balances_dict = json.loads(i.bio)
-
+            balances_dict = json.loads(Profile.objects.get(user=self.request.user.pk).bio)
             balances_lst = read('demofiles/balances_lst.json')
             lst_coin = [x.keys() for x in balances_lst]
             set_coins = set()
@@ -256,7 +246,6 @@ class Bunches_view(LoginRequiredMixin, DataMixin, ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context(title='bunches')
-        print()
         return dict(list(context.items()) + list(c_def.items()))
 
     def get_queryset(self):
